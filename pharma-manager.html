@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pharma Manager — Production & Tech-Transfer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--bg2:#ffffff;--bg3:#f7f8fa;--bg4:#eef0f4;
+  --border:#e2e5eb;--border2:#c8cdd8;
+  --text:#1a2332;--text2:#4a5568;--text3:#8a97a8;
+  --accent:#1a56db;--accent2:#1a56db;--accentbg:#eff4ff;--accentborder:#bfcfff;
+  --warn:#d97706;--warnbg:#fffbeb;--warnborder:#fcd34d;
+  --danger:#dc2626;--dangerbg:#fff5f5;--dangerborder:#fca5a5;
+  --success:#059669;--successbg:#ecfdf5;--successborder:#6ee7b7;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.06),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;line-height:1.5;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:var(--accent);box-shadow:0 2px 8px rgba(26,86,219,0.3);position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:15px;color:#fff;font-weight:600;letter-spacing:0.2px;}
+.topbar-brand span{color:rgba(255,255,255,0.7);font-weight:400;font-size:13px;}
+.topbar-status{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.75);font-family:var(--mono);}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.nav{display:none;} /* hidden — bottom nav replaces this */
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  display:flex;align-items:stretch;
+  background:var(--bg2);border-top:1px solid var(--border);
+  box-shadow:0 -2px 12px rgba(0,0,0,0.08);
+  height:60px;
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:transparent;color:var(--text3);
+  font-family:var(--sans);font-size:9px;font-weight:500;letter-spacing:0.3px;
+  cursor:pointer;transition:all 0.15s;padding:6px 2px;
+  border-top:2px solid transparent;
+}
+.bnav-btn:hover{color:var(--accent);background:var(--accentbg);}
+.bnav-btn.active{color:var(--accent);border-top-color:var(--accent);background:var(--accentbg);}
+.bnav-icon{font-size:18px;line-height:1;}
+.bnav-label{font-size:9px;font-weight:600;text-align:center;line-height:1.2;}
+/* main padding for bottom nav */
+.main{flex:1;padding:20px 16px 76px;max-width:1400px;width:100%;margin:0 auto;}
+@media(min-width:768px){
+  .main{padding:24px 28px 76px;}
+  .bnav-label{font-size:10px;}
+  .bnav-icon{font-size:20px;}
+  .bottom-nav{height:64px;}
+}
+/* hide old tab-bar completely */
+.tab-bar{display:none!important;}
+.tab-content{display:none;}.tab-content.active{display:block;}
+.panel{display:none;}.panel.active{display:block;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);letter-spacing:0.1px;}
+.sec-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.btn{padding:7px 14px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow);}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accentbg);}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500;box-shadow:0 2px 4px rgba(26,86,219,0.25);}
+.btn.primary:hover{background:var(--accent2);border-color:var(--accent2);}
+.btn.danger{border-color:var(--dangerborder);color:var(--danger);background:var(--bg2);}
+.btn.danger:hover{background:var(--dangerbg);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;box-shadow:var(--shadow);}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 18px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:6px;}
+.stat-value{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text);}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);}
+table{width:100%;border-collapse:collapse;background:var(--bg2);}
+thead tr{background:var(--bg3);border-bottom:2px solid var(--border);}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:0.4px;color:var(--text3);text-transform:uppercase;white-space:nowrap;}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#f8faff;}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:500;letter-spacing:0.2px;}
+.badge.pass{background:var(--successbg);color:var(--success);border:1px solid var(--successborder);}
+.badge.fail{background:var(--dangerbg);color:var(--danger);border:1px solid var(--dangerborder);}
+.badge.ip{background:var(--accentbg);color:var(--accent);border:1px solid var(--accentborder);}
+.badge.comp{background:var(--successbg);color:var(--success);border:1px solid var(--successborder);}
+.badge.hold{background:var(--warnbg);color:var(--warn);border:1px solid var(--warnborder);}
+.progress-wrap{background:var(--bg4);border-radius:4px;height:6px;}
+.progress-bar{height:6px;border-radius:4px;background:var(--accent);transition:width 0.3s;}
+.ipc-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+.ipc-pass{background:var(--successbg);color:var(--success);}
+.ipc-fail{background:var(--dangerbg);color:var(--danger);}
+.chart-area{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px;box-shadow:var(--shadow);}
+.chart-title{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:16px;}
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:140px;padding-bottom:4px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;}
+.bar{width:100%;border-radius:3px 3px 0 0;transition:opacity 0.2s;cursor:default;min-height:4px;}
+.bar:hover{opacity:0.75;}
+.bar-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
+.bar-val{font-family:var(--mono);font-size:9px;color:var(--text2);}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.12);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:12px 12px 0 0;}
+.modal-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.1px;}
+.modal-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px;}
+.modal-close:hover{color:var(--text);background:var(--bg4);}
+.modal-body{padding:22px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.3px;text-transform:uppercase;}
+input,select,textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 10px;outline:none;transition:border 0.15s,box-shadow 0.15s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,0.1);}
+select option{background:var(--bg2);}
+textarea{resize:vertical;min-height:80px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--border);background:var(--bg3);border-radius:0 0 12px 12px;}
+/* TABS */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;background:var(--bg2);border-radius:8px 8px 0 0;padding:0 4px;}
+.tab-btn{padding:10px 16px;border:none;background:none;color:var(--text3);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--bg3);border-radius:6px 6px 0 0;}
+.tab-content{display:none;}.tab-content.active{display:block;}
+/* DUMMY BANNER */
+.dummy-banner{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--warnbg);border:1px solid var(--warnborder);border-radius:6px;margin-bottom:20px;font-size:12px;font-weight:500;color:var(--warn);}
+/* EXTRA FIELDS SECTION */
+.extra-fields-toggle{display:flex;align-items:center;gap:8px;margin:12px 0 8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--accent);background:var(--accentbg);border:1px dashed var(--accentborder);border-radius:6px;padding:8px 12px;width:100%;transition:all 0.15s;}
+.extra-fields-toggle:hover{background:var(--accentbg);border-style:solid;}
+.extra-fields-body{display:none;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;background:var(--bg3);}
+.extra-fields-body.open{display:block;}
+.extra-field-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;}
+.extra-field-row input{padding:6px 8px;font-size:12px;}
+/* MULTI-SELECT EQUIP */
+.equip-multi-list{max-height:180px;overflow-y:auto;border:1px solid var(--border2);border-radius:6px;background:var(--bg2);padding:6px;}
+.equip-multi-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;}
+.equip-multi-item:hover{background:var(--accentbg);}
+.equip-multi-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;}
+.equip-multi-item label{font-size:12px;color:var(--text);cursor:pointer;letter-spacing:0;text-transform:none;margin:0;font-weight:400;}
+/* MATRIX TABLE */
+.matrix-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);}
+.matrix-table{border-collapse:collapse;min-width:100%;background:var(--bg2);}
+.matrix-table th,.matrix-table td{border:1px solid var(--border);padding:8px 12px;font-size:12px;white-space:nowrap;}
+.matrix-table thead th{background:var(--bg3);font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;}
+.matrix-table thead th.eq-col{writing-mode:vertical-lr;transform:rotate(180deg);text-align:left;padding:12px 8px;font-size:10px;min-width:36px;max-width:36px;}
+.matrix-table tbody td:first-child{background:var(--bg3);font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;}
+.matrix-table tbody td:nth-child(2){background:var(--bg3);font-size:12px;color:var(--text2);}
+.matrix-cell-tick{display:block;width:100%;text-align:center;font-size:14px;}
+.matrix-cell-tick.primary{color:var(--success);}
+/* RECIPE CARD */
+.recipe-steps{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.step-row{display:flex;align-items:flex-start;gap:8px;}
+.step-num{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:20px;margin-top:2px;}
+.step-content{font-size:12px;color:var(--text2);line-height:1.5;}
+/* EQUIP EXTRA DETAILS */
+.equip-extra-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.extra-pill{font-size:10px;font-weight:500;color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:2px 7px;}
+.extra-pill span{color:var(--text2);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg3);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+/* GANTT CHART */
+.gantt-label{font-size:11px;font-weight:500;color:var(--text2);width:150px;min-width:150px;padding-right:10px;line-height:1.3;word-break:break-word;}
+.gantt-track{flex:1;height:26px;background:var(--bg4);border-radius:4px;position:relative;overflow:visible;}
+.gantt-bar{height:100%;border-radius:4px;position:absolute;top:0;display:flex;align-items:center;justify-content:flex-start;font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px;transition:opacity 0.15s;cursor:default;min-width:4px;}
+.gantt-bar:hover{opacity:0.8;}
+.gantt-bar.done{background:var(--success);}
+.gantt-bar.active{background:var(--accent);animation:gpulse 1.8s infinite;}
+.gantt-bar.pending{background:var(--border2);}
+@keyframes gpulse{0%,100%{opacity:1}50%{opacity:0.65}}
+.gantt-hrs{font-family:var(--mono);font-size:10px;color:var(--text3);width:32px;min-width:32px;text-align:right;padding-left:6px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="topbar-brand">⬡ PHARMA MANAGER</div>
+  <div class="topbar-status"><div class="dot"></div> SYSTEM LIVE &nbsp;|&nbsp; <span id="clock" style="color:#fff;font-family:var(--mono);"></span></div>
+</div>
+
+<div class="nav" style="padding:0 28px;">
+  <button class="nav-btn active" onclick="showPanel('equipment',this)" style="cursor:default;">PRODUCTION & TECH-TRANSFER</button>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════
+     PANEL 1 — EQUIPMENT MASTER
+══════════════════════════════════════ -->
+<div class="panel active" id="panel-equipment">
+
+  <!-- tab-bar removed — bottom nav handles switching -->
+
+  <!-- Equipment List -->
+  <div class="tab-content active" id="eq-tab-equip">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Total Equipment</div><div class="stat-value" style="color:var(--accent)" id="eq-total">0</div></div>
+      <div class="stat-card"><div class="stat-label">Reactors (SSR/GLR/HSR)</div><div class="stat-value" id="eq-reactors">0</div></div>
+      <div class="stat-card"><div class="stat-label">ANFD / PNF / CF</div><div class="stat-value" id="eq-centrifuges">0</div></div>
+      <div class="stat-card"><div class="stat-label">VTD</div><div class="stat-value" id="eq-dryers">0</div></div>
+      <div class="stat-card"><div class="stat-label">Recipes Loaded</div><div class="stat-value" style="color:var(--accent)" id="eq-recipes">0</div></div>
+    </div>
+    <div class="sec-head">
+      <div><div class="sec-title">Equipment Master</div><div class="sec-sub">Fixed reference data — grouped by location</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="eq-filter-type" onchange="renderEquipment()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;">
+          <option value="ALL">All Types</option>
+        <option value="Reactor">Reactor (SSR / GLR / HSR)</option>
+          <option value="ANFD">ANFD</option>
+          <option value="PNF">PNF</option>
+          <option value="VTD">VTD</option>
+          <option value="Centrifuge">Centrifuge</option>
+          <option value="Sparkler Filter">Sparkler Filter</option>
+          <option value="Co-Mill">Co-Mill</option>
+        </select>
+        <button class="btn primary" onclick="resetEquipModal();openModal('modal-add-equip')">+ Add Equipment</button>
+      </div>
+    </div>
+    <div id="equip-grouped-view"></div>
+    <!-- hidden tbody for backward compat -->
+    <table style="display:none"><tbody id="equip-tbody"></tbody></table>
+  </div>
+
+  <!-- Recipe Repository -->
+  <div class="tab-content" id="eq-tab-recipe">
+    <div class="sec-head">
+      <div><div class="sec-title">Recipe Repository</div><div class="sec-sub">Product-wise manufacturing recipes with equipment linkage</div></div>
+      <button class="btn primary" onclick="openRecipeModal()">+ Add Recipe</button>
+    </div>
+    <div id="recipe-grid" style="display:grid;grid-template-columns:1fr;gap:0;margin-bottom:24px;"></div>
+  </div>
+
+  <!-- Equipment Matrix -->
+  <div class="tab-content" id="eq-tab-matrix">
+    <div class="sec-head">
+      <div><div class="sec-title">Equipment Matrix</div><div class="sec-sub">Product × Equipment — auto-generated from recipes</div></div>
+      <div style="display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;color:var(--text3);">
+        <span style="color:var(--success);">✔ Primary</span>
+        <span style="color:var(--warn);">◈ Alternate</span>
+        <span style="color:var(--border2);">— Not Used</span>
+      </div>
+    </div>
+    <div class="matrix-wrap" id="matrix-container"></div>
+  </div>
+
+  <!-- Equipment Mapping -->
+  <div class="tab-content" id="eq-tab-map">
+    <div class="sec-head">
+      <div><div class="sec-title">Equipment Mapping</div><div class="sec-sub">Select recipe → get equipment train for target batch size</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Select Product / Recipe</label>
+          <select id="map-recipe-sel" onchange="generateMapping()"></select>
+        </div>
+        <div class="form-group">
+          <label>Target Batch Size (Kg)</label>
+          <input type="number" id="map-batch-size" value="500" onchange="generateMapping()"/>
+        </div>
+      </div>
+    </div>
+    <div id="mapping-result"></div>
+  </div>
+
+  <!-- Live Batch Tracking TAB -->
+  <div class="tab-content" id="eq-tab-batch">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Active Batches</div><div class="stat-value" style="color:var(--accent)" id="b-active">0</div></div>
+      <div class="stat-card"><div class="stat-label">Completed Today</div><div class="stat-value" style="color:var(--success)" id="b-comp">0</div></div>
+      <div class="stat-card"><div class="stat-label">On Hold</div><div class="stat-value" style="color:var(--warn)" id="b-hold">0</div></div>
+      <div class="stat-card"><div class="stat-label">IPC Alerts</div><div class="stat-value" style="color:var(--danger)" id="b-alerts">0</div></div>
+    </div>
+    <div class="sec-head">
+      <div><div class="sec-title">Batch Register</div><div class="sec-sub">Live & recent batches</div></div>
+      <button class="btn primary" onclick="openModal('modal-add-batch')">+ Log New Batch</button>
+    </div>
+    <div class="table-wrap" style="margin-bottom:24px;">
+      <table>
+        <thead><tr><th>Batch No.</th><th>Product</th><th>Stage</th><th>Batch Size</th><th>Start Date</th><th>Current Step</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="batch-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- GANTT CHART SECTION -->
+    <div class="sec-head" style="margin-top:8px;">
+      <div><div class="sec-title">Batch Gantt Chart</div><div class="sec-sub">Operation timeline from recipe — select a batch to visualize</div></div>
+      <select id="gantt-batch-sel" onchange="renderGantt()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;max-width:220px;">
+        <option value="">— Select Batch —</option>
+      </select>
+    </div>
+    <div id="gantt-container" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:24px;box-shadow:var(--shadow);">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Log a batch and select it above to see the Gantt chart.</div>
+    </div>
+
+    <div id="batch-detail-area"></div>
+  </div>
+
+  <!-- Trend Data TAB -->
+  <div class="tab-content" id="eq-tab-trend">
+
+    <!-- Product Summary from Recipe -->
+    <div class="sec-head">
+      <div><div class="sec-title">Product & Stage Summary</div><div class="sec-sub">From recipe data — theoretical yield & operations</div></div>
+      <select id="trend-product-filter" onchange="renderTrendData()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;">
+        <option value="ALL">All Products</option>
+      </select>
+    </div>
+    <div id="trend-product-cards" style="margin-bottom:24px;"></div>
+
+    <!-- Yield Register (actual batch results) -->
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Avg. Yield (Actual)</div><div class="stat-value" style="color:var(--accent)" id="y-avg">—</div></div>
+      <div class="stat-card"><div class="stat-label">Best Batch</div><div class="stat-value" style="color:var(--success)" id="y-best">—</div></div>
+      <div class="stat-card"><div class="stat-label">Lowest Batch</div><div class="stat-value" style="color:var(--danger)" id="y-low">—</div></div>
+      <div class="stat-card"><div class="stat-label">Total Logged</div><div class="stat-value" id="y-total">0</div></div>
+    </div>
+    <div class="sec-head">
+      <div><div class="sec-title">Actual Yield Register</div><div class="sec-sub">Batch-wise final results</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="yield-product-filter" onchange="renderYieldChart()" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;"></select>
+        <button class="btn primary" onclick="openModal('modal-add-yield')">+ Add Result</button>
+      </div>
+    </div>
+    <div class="chart-area">
+      <div class="chart-title" id="chart-title-label">Yield % per batch</div>
+      <div class="bar-chart" id="yield-chart"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Batch No.</th><th>Product</th><th>Batch Size</th><th>Theoretical</th><th>Actual</th><th>Yield %</th><th>Purity %</th><th>Appearance</th><th>Result</th><th></th></tr></thead>
+        <tbody id="yield-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end panel-equipment -->
+
+</div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- BOTTOM NAVIGATION BAR -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bnav-btn active" onclick="switchTab(this,'eq-tab-equip')" data-tab="eq-tab-equip">
+    <span class="bnav-icon">🔧</span>
+    <span class="bnav-label">Equipment<br>Master</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-recipe')" data-tab="eq-tab-recipe">
+    <span class="bnav-icon">📋</span>
+    <span class="bnav-label">Product<br>Recipe</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-map')" data-tab="eq-tab-map">
+    <span class="bnav-icon">🗺️</span>
+    <span class="bnav-label">Equipment<br>Mapping</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-matrix')" data-tab="eq-tab-matrix">
+    <span class="bnav-icon">⊞</span>
+    <span class="bnav-label">Equipment<br>Matrix</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-batch')" data-tab="eq-tab-batch">
+    <span class="bnav-icon">⚡</span>
+    <span class="bnav-label">Live Batch<br>Tracking</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-trend')" data-tab="eq-tab-trend">
+    <span class="bnav-icon">📈</span>
+    <span class="bnav-label">Trend<br>Data</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- ADD EQUIPMENT MODAL -->
+<div class="modal-overlay" id="modal-add-equip">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="equip-modal-title">Add Equipment — Master Data</span><button class="modal-close" onclick="closeModal('modal-add-equip')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Equipment ID *</label><input id="ne-id" placeholder="e.g. R-101"/></div>
+        <div class="form-group"><label>Equipment Name *</label><input id="ne-name" placeholder="e.g. SS Reactor 1000L"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Type</label>
+          <select id="ne-type"><option>Reactor</option><option>Centrifuge</option><option>Dryer</option><option>Filter / Nutsche</option><option>Distillation Column</option><option>Storage Tank</option><option>Crystallizer</option><option>Heat Exchanger</option><option>Mill / Sifter</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Capacity</label><input id="ne-cap" placeholder="e.g. 1000 L"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>MOC</label><input id="ne-moc" placeholder="e.g. SS 316L"/></div>
+        <div class="form-group"><label>Jacket Type</label>
+          <select id="ne-jacket"><option>Hot Water</option><option>Steam</option><option>Chilled Water</option><option>Brine</option><option>Hot Water / Steam</option><option>Hot Water / Chilled Water</option><option>Steam / Brine</option><option>None</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Agitator Type</label>
+          <select id="ne-agit"><option>Anchor</option><option>Turbine</option><option>Paddle</option><option>Propeller</option><option>Gate</option><option>None</option></select>
+        </div>
+        <div class="form-group"><label>Location / Block</label><input id="ne-loc" placeholder="e.g. Block-A, F-2"/></div>
+      </div>
+
+      <!-- EXTRA FIELDS TOGGLE -->
+      <button class="extra-fields-toggle" type="button" onclick="toggleExtraFields()">
+        <span id="extra-toggle-icon">＋</span> &nbsp;Add More Details (optional)
+      </button>
+      <div class="extra-fields-body" id="extra-fields-body">
+        <div class="form-row" style="margin-bottom:10px;">
+          <div class="form-group"><label>Operating Pressure (bar)</label><input id="ne-pressure" placeholder="e.g. 0 – 3 bar"/></div>
+          <div class="form-group"><label>Operating Temp (°C)</label><input id="ne-temp" placeholder="e.g. -20 to 150°C"/></div>
+        </div>
+        <div class="form-row" style="margin-bottom:10px;">
+          <div class="form-group"><label>Agitator Speed (RPM)</label><input id="ne-rpm" placeholder="e.g. 10 – 120 RPM"/></div>
+          <div class="form-group"><label>Drive Motor (kW)</label><input id="ne-motor" placeholder="e.g. 15 kW"/></div>
+        </div>
+        <div class="form-row" style="margin-bottom:10px;">
+          <div class="form-group"><label>Utilities Required</label><input id="ne-utilities" placeholder="e.g. Steam, CW, Brine, N2"/></div>
+          <div class="form-group"><label>Last Maintenance Date</label><input type="date" id="ne-maint-date"/></div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Custom Fields</div>
+          <div id="custom-fields-list"></div>
+          <button type="button" class="btn" onclick="addCustomField()" style="font-size:10px;padding:5px 10px;margin-top:4px;">+ Add Custom Field</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-equip')">Cancel</button>
+      <button class="btn primary" id="equip-modal-save-btn" onclick="addEquipment()">Add to Master</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD RECIPE MODAL -->
+<div class="modal-overlay" id="modal-add-recipe">
+  <div class="modal" style="width:760px;">
+    <div class="modal-header"><span class="modal-title" id="recipe-modal-title">Add Recipe</span><button class="modal-close" onclick="closeModal('modal-add-recipe')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Product Name *</label><input id="nr-prod" placeholder="e.g. Metformin HCl"/></div>
+        <div class="form-group"><label>Stage</label><input id="nr-stage" placeholder="e.g. API Final, Intermediate-1"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Batch Size (Kg)</label><input type="number" id="nr-size" placeholder="500"/></div>
+        <div class="form-group"><label>Cycle Time (hrs)</label><input type="number" id="nr-time" placeholder="24"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Theoretical Yield (%)</label><input type="number" id="nr-yield" placeholder="85"/></div>
+      </div>
+
+      <!-- OPERATION-WISE EQUIPMENT BUILDER -->
+      <div class="form-group full" style="margin-top:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label style="margin:0;">Operations & Equipment</label>
+          <button type="button" class="btn primary" onclick="addRecipeStep()" style="padding:5px 12px;font-size:11px;">+ Add Operation</button>
+        </div>
+        <!-- Column headers -->
+        <div style="display:grid;grid-template-columns:32px 1fr 220px 36px;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px 6px 0 0;border-bottom:none;">
+          <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">#</span>
+          <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Operation Name</span>
+          <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Equipment Used (optional, multi-select)</span>
+          <span></span>
+        </div>
+        <div id="nr-steps-list" style="border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;"></div>
+        <div id="nr-steps-empty" style="border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;padding:20px;text-align:center;font-size:12px;color:var(--text3);">
+          Click "+ Add Operation" to start building this stage
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-recipe')">Cancel</button>
+      <button class="btn primary" id="recipe-modal-save-btn" onclick="addRecipe()">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BATCH MODAL -->
+<div class="modal-overlay" id="modal-add-batch">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Log New Batch</span><button class="modal-close" onclick="closeModal('modal-add-batch')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Batch No. *</label><input id="nb-no" placeholder="e.g. B-2025-001"/></div>
+        <div class="form-group"><label>Start Date</label><input type="date" id="nb-date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Product *</label>
+          <select id="nb-prod" onchange="populateBatchStages()">
+            <option value="">— Select Product —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stage *</label>
+          <select id="nb-stage" onchange="populateBatchOperations()">
+            <option value="">— Select Stage —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Batch Size (Kg)</label><input type="number" id="nb-size"/></div>
+        <div class="form-group">
+          <label>Current Operation</label>
+          <select id="nb-step">
+            <option value="">— Select Operation —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Status</label>
+          <select id="nb-status"><option value="ip">In Progress</option><option value="hold">On Hold</option><option value="comp">Completed</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-batch')">Cancel</button>
+      <button class="btn primary" onclick="addBatch()">Log Batch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD YIELD MODAL -->
+<div class="modal-overlay" id="modal-add-yield">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add Yield / Analytical Result</span><button class="modal-close" onclick="closeModal('modal-add-yield')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Batch No.</label><input id="ny-no" placeholder="e.g. B-2025-001"/></div>
+        <div class="form-group"><label>Product</label><input id="ny-prod" placeholder="e.g. Metformin HCl"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Batch Size (Kg)</label><input type="number" id="ny-size"/></div>
+        <div class="form-group"><label>Theoretical Yield (Kg)</label><input type="number" id="ny-theo"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Actual Yield (Kg)</label><input type="number" id="ny-actual" oninput="calcYield()"/></div>
+        <div class="form-group"><label>Yield %</label><input id="ny-yp" readonly style="background:var(--bg4);"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Purity % (HPLC)</label><input type="number" id="ny-pur" step="0.01"/></div>
+        <div class="form-group"><label>Appearance</label><input id="ny-app" placeholder="e.g. White crystalline solid"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Result</label><select id="ny-result"><option value="pass">Pass</option><option value="fail">Fail</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-yield')">Cancel</button>
+      <button class="btn primary" onclick="addYieldResult()">Save Result</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});}
+setInterval(updateClock,1000);updateClock();
+
+// ══════════════════════════════════════
+// NAV & TABS
+// ══════════════════════════════════════
+function showPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+function switchTab(btn,tabId){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  const match=document.querySelector(`.bnav-btn[data-tab="${tabId}"]`);
+  if(match) match.classList.add('active');
+  if(tabId==='eq-tab-matrix') renderMatrix();
+  if(tabId==='eq-tab-map') generateMapping();
+  if(tabId==='eq-tab-trend') renderTrendData();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modal-add-batch') populateBatchProducts();
+}
+
+function populateBatchProducts(){
+  const sel=document.getElementById('nb-prod');
+  if(!sel) return;
+  const prods=[...new Set(recipeData.map(r=>r.prod))];
+  sel.innerHTML='<option value="">— Select Product —</option>'+prods.map(p=>`<option value="${p}">${p}</option>`).join('');
+  document.getElementById('nb-stage').innerHTML='<option value="">— Select Stage —</option>';
+  document.getElementById('nb-step').innerHTML='<option value="">— Select Operation —</option>';
+}
+
+function populateBatchStages(){
+  const prod=document.getElementById('nb-prod').value;
+  const stageSel=document.getElementById('nb-stage');
+  const stepSel=document.getElementById('nb-step');
+  stageSel.innerHTML='<option value="">— Select Stage —</option>';
+  stepSel.innerHTML='<option value="">— Select Operation —</option>';
+  if(!prod) return;
+  const stages=recipeData.filter(r=>r.prod===prod);
+  stages.forEach(r=>{
+    stageSel.innerHTML+=`<option value="${r.stage}">${r.stage}</option>`;
+  });
+  if(stages.length===1){
+    stageSel.value=stages[0].stage;
+    populateBatchOperations();
+  }
+}
+
+function populateBatchOperations(){
+  const prod=document.getElementById('nb-prod').value;
+  const stage=document.getElementById('nb-stage').value;
+  const stepSel=document.getElementById('nb-step');
+  stepSel.innerHTML='<option value="">— Select Operation —</option>';
+  if(!prod||!stage) return;
+  const recipe=recipeData.find(r=>r.prod===prod&&r.stage===stage);
+  if(!recipe) return;
+  (recipe.steps||[]).forEach((s,i)=>{
+    stepSel.innerHTML+=`<option value="${s.desc}">${i+1}. ${s.desc}</option>`;
+  });
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+// ══════════════════════════════════════
+// EXTRA FIELDS TOGGLE
+// ══════════════════════════════════════
+function toggleExtraFields(){
+  const body=document.getElementById('extra-fields-body');
+  const icon=document.getElementById('extra-toggle-icon');
+  const open=body.classList.toggle('open');
+  icon.textContent=open?'−':'＋';
+}
+let customFieldCount=0;
+function addCustomField(){
+  customFieldCount++;
+  const div=document.createElement('div');
+  div.className='extra-field-row';
+  div.id='cf-row-'+customFieldCount;
+  div.innerHTML=`
+    <input placeholder="Field label (e.g. Seal Type)" id="cf-label-${customFieldCount}"/>
+    <input placeholder="Value (e.g. Mechanical Seal)" id="cf-val-${customFieldCount}"/>
+    <button class="btn danger" onclick="document.getElementById('cf-row-${customFieldCount}').remove()" style="padding:6px 10px;font-size:11px;">✕</button>
+  `;
+  document.getElementById('custom-fields-list').appendChild(div);
+}
+
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+let equipmentData=[
+  // ── SECOND FLOOR ──
+  {id:'PRO2-SSR2000-002',name:'Stainless Steel Reactor 2000L',type:'Reactor',cap:'2000 KL',moc:'SS 316',jacket:'—',agit:'Half Anchor + Propeller',loc:'Second Floor',extra:{rpm:'62',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'60 L'},{label:'TP Touch Vol',val:'400 L'},{label:'Max. Stirrable Vol',val:'2000 L'},{label:'Primary Condenser',val:'4.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'11.17 m²'}]},
+  {id:'PRO2-GLR2500-003',name:'Glass Lined Reactor 2500L',type:'Reactor',cap:'2500 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'Second Floor',extra:{rpm:'49',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'190 L'},{label:'TP Touch Vol',val:'510 L'},{label:'Max. Stirrable Vol',val:'2500 L'},{label:'Primary Condenser',val:'4.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'15.38 m²'}]},
+  {id:'PRO2-SSR3000-001',name:'Stainless Steel Reactor 3000L',type:'Reactor',cap:'3000 KL',moc:'SS 316',jacket:'—',agit:'Half Anchor + Propeller',loc:'Second Floor',extra:{rpm:'60',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'90 L'},{label:'TP Touch Vol',val:'420 L'},{label:'Max. Stirrable Vol',val:'3000 L'},{label:'Primary Condenser',val:'6.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'14.12 m²'}]},
+  {id:'PRO2-GLR2000-002',name:'Glass Lined Reactor 2000L',type:'Reactor',cap:'2000 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'Second Floor',extra:{rpm:'49',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'80 L'},{label:'TP Touch Vol',val:'80 L'},{label:'Max. Stirrable Vol',val:'2000 L'},{label:'Primary Condenser',val:'4.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'12.16 m²'}]},
+  {id:'PRO2-GLR3000-001',name:'Glass Lined Reactor 3000L',type:'Reactor',cap:'3000 KL',moc:'MSGL',jacket:'—',agit:'Propeller',loc:'Second Floor',extra:{rpm:'102',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'40 L'},{label:'TP Touch Vol',val:'150 L'},{label:'Max. Stirrable Vol',val:'3000 L'},{label:'Primary Condenser',val:'6.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'14.94 m²'}]},
+  {id:'PRO2-ANFD500-005',name:'Agitated Nutsche Filter Dryer 500L',type:'ANFD',cap:'500 KL',moc:'SS 316',jacket:'—',agit:"'S' Type Blade",loc:'Second Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-PNF500-002',name:'Pressure Nutsche Filter Dryer 500L',type:'PNF',cap:'500 KL',moc:'SS316',jacket:'—',agit:'—',loc:'Second Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+
+  // ── FIRST FLOOR ──
+  {id:'PRO2-SSR2000-005',name:'Stainless Steel Reactor 2000L',type:'Reactor',cap:'2000 KL',moc:'SS 316',jacket:'—',agit:'Half Anchor + Propeller',loc:'First Floor',extra:{rpm:'62',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'70 L'},{label:'TP Touch Vol',val:'140 L'},{label:'Max. Stirrable Vol',val:'2000 L'},{label:'Primary Condenser',val:'4.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'11.17 m²'}]},
+  {id:'PRO2-SSR4000-006',name:'Stainless Steel Reactor 4000L',type:'Reactor',cap:'4000 KL',moc:'SS 316',jacket:'—',agit:'Half Anchor + Propeller',loc:'First Floor',extra:{rpm:'60',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'90 L'},{label:'TP Touch Vol',val:'250 L'},{label:'Max. Stirrable Vol',val:'4000 L'},{label:'Primary Condenser',val:'7.0 m²'},{label:'Secondary Condenser',val:'2.0 m²'},{label:'Surface Area',val:'17.22 m²'}]},
+  {id:'PRO2-GLR2000-010',name:'Glass Lined Reactor 2000L',type:'Reactor',cap:'2000 KL',moc:'MSGL',jacket:'—',agit:'Propeller',loc:'First Floor',extra:{rpm:'102',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'90 L'},{label:'TP Touch Vol',val:'250 L'},{label:'Max. Stirrable Vol',val:'2000 L'},{label:'Primary Condenser',val:'4.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'11.96 m²'}]},
+  {id:'PRO2-GLR3000-011',name:'Glass Lined Reactor 3000L',type:'Reactor',cap:'3000 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'First Floor',extra:{rpm:'49',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'60 L'},{label:'TP Touch Vol',val:'350 L'},{label:'Max. Stirrable Vol',val:'3000 L'},{label:'Primary Condenser',val:'6.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'},{label:'Surface Area',val:'15.22 m²'}]},
+  {id:'PRO2-GLR4000-012',name:'Glass Lined Reactor 4000L',type:'Reactor',cap:'4000 KL',moc:'MSGL',jacket:'—',agit:'Propeller',loc:'First Floor',extra:{rpm:'106',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'200 L'},{label:'TP Touch Vol',val:'200 L'},{label:'Max. Stirrable Vol',val:'4000 L'},{label:'Primary Condenser',val:'7.0 m²'},{label:'Secondary Condenser',val:'2.0 m²'},{label:'Surface Area',val:'22.65 m²'}]},
+  {id:'PRO2-SSR600-004',name:'Stainless Steel Reactor 600L',type:'Reactor',cap:'600 KL',moc:'SS 316',jacket:'—',agit:'Half Anchor + Propeller',loc:'First Floor',extra:{rpm:'0–48',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'60 L'},{label:'TP Touch Vol',val:'110 L'},{label:'Max. Stirrable Vol',val:'600 L'},{label:'Primary Condenser',val:'1.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'}]},
+  {id:'PRO2-GLR630-013',name:'Glass Lined Reactor 630L',type:'Reactor',cap:'630 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'First Floor',extra:{rpm:'0–52',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'32 L'},{label:'TP Touch Vol',val:'204 L'},{label:'Max. Stirrable Vol',val:'630 L'},{label:'Primary Condenser',val:'1.5 m²'},{label:'Secondary Condenser',val:'1.5 m²'}]},
+  {id:'PRO2-CFG24-001',name:'Halar Centrifuge 24"',type:'Centrifuge',cap:'24"',moc:'SS316',jacket:'—',agit:'—',loc:'First Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-VTD24-001',name:'Vacuum Tray Dryer 24 Trays',type:'VTD',cap:'24 Trays',moc:'SS 316',jacket:'—',agit:'—',loc:'First Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+
+  // ── GROUND FLOOR ──
+  {id:'PRO2-ANFD250-007',name:'Agitated Nutsche Filter Dryer 250L',type:'ANFD',cap:'250 KL',moc:'SS 316',jacket:'—',agit:"'S' Type Blade",loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-ANFD2000-001',name:'Agitated Nutsche Filter Dryer 2000L',type:'ANFD',cap:'2000 KL',moc:'SS 316',jacket:'—',agit:"'S' Type Blade",loc:'Ground Floor',extra:{rpm:'12',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-ANFD2000-002',name:'Agitated Nutsche Filter Dryer 2000L',type:'ANFD',cap:'2000 KL',moc:'SS 316',jacket:'—',agit:"'S' Type Blade",loc:'Ground Floor',extra:{rpm:'12',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-SPF14-001',name:'Sparkler Filter 14" (Non-Jacked)',type:'Sparkler Filter',cap:'14"',moc:'SS316',jacket:'Non-Jacked',agit:'—',loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-SPF14-002',name:'Sparkler Filter 14" (Jacked)',type:'Sparkler Filter',cap:'14"',moc:'SS316',jacket:'Jacked',agit:'—',loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-SPF18-003',name:'Sparkler Filter 18" (Jacked)',type:'Sparkler Filter',cap:'18"',moc:'SS316',jacket:'Jacked',agit:'—',loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-PNF500-001',name:'Pressure Nutsche Filter Dryer 500L',type:'PNF',cap:'500 KL',moc:'SS316',jacket:'—',agit:'—',loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-PNF500-002-GF',name:'Pressure Nutsche Filter Dryer 500L',type:'PNF',cap:'500 KL',moc:'SS316',jacket:'—',agit:'—',loc:'Ground Floor',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+
+  // ── CHARCOALIZATION ──
+  {id:'PRO2-GLR2000-006',name:'Glass Lined Reactor 2000L',type:'GL Reactor',cap:'2000 KL',moc:'MSGL',jacket:'—',agit:'Propeller',loc:'Charcoalization',extra:{rpm:'103',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'145 L'},{label:'TP Touch Vol',val:'239 L'},{label:'Max. Stirrable Vol',val:'2000 L'}]},
+
+  // ── CRYSTAL - I ──
+  {id:'PRO2-HSR2000-001',name:'Hastelloy Reactor 2000L',type:'Hastelloy Reactor',cap:'2000 KL',moc:'Hastelloy',jacket:'—',agit:'Half Anchor + Propeller',loc:'Crystal - I',extra:{rpm:'60',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'40 L'},{label:'TP Touch Vol',val:'130 L'},{label:'Max. Stirrable Vol',val:'2000 L'},{label:'Primary Condenser',val:'4.5 m²'}]},
+  {id:'PRO2-ANFD1000-004',name:'Agitated Nutsche Filter Dryer 1000L',type:'ANFD',cap:'1000 KL',moc:'SS316L',jacket:'—',agit:"'S' Type Blade",loc:'Crystal - I',extra:{rpm:'12',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-COM8-001',name:'Co-Mill 8"',type:'Co-Mill',cap:'8"',moc:'—',jacket:'—',agit:'—',loc:'Crystal - I',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+
+  // ── CRYSTAL - II ──
+  {id:'PRO2-GLR3000-007',name:'Glass Lined Reactor 3000L',type:'GL Reactor',cap:'3000 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'Crystal - II',extra:{rpm:'48',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'150 L'},{label:'TP Touch Vol',val:'420 L'},{label:'Max. Stirrable Vol',val:'3000 L'},{label:'Primary Condenser',val:'6.5 m²'}]},
+  {id:'PRO2-ANFD2000-003',name:'Agitated Nutsche Filter Dryer 2000L',type:'ANFD',cap:'2000 KL',moc:'SS316',jacket:'—',agit:"'S' Type Blade",loc:'Crystal - II',extra:{rpm:'12',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+  {id:'PRO2-COM8-002',name:'Co-Mill 8"',type:'Co-Mill',cap:'8"',moc:'—',jacket:'—',agit:'—',loc:'Crystal - II',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+
+  // ── CRYSTAL - III ──
+  {id:'PRO2-SSR500-003',name:'Stainless Steel Reactor 500L',type:'Reactor',cap:'500 KL',moc:'SS 316',jacket:'—',agit:'Anchor + Propeller',loc:'Crystal - III',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'34 L'},{label:'TP Touch Vol',val:'37 L'},{label:'Max. Stirrable Vol',val:'500 L'},{label:'Primary Condenser',val:'5.0 m²'}]},
+  {id:'PRO2-GLR400-014',name:'Glass Lined Reactor 400L',type:'Reactor',cap:'400 KL',moc:'MSGL',jacket:'—',agit:'Anchor',loc:'Crystal - III',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[{label:'Min. Stirrable Vol',val:'45 L'},{label:'TP Touch Vol',val:'190 L'},{label:'Max. Stirrable Vol',val:'400 L'},{label:'Primary Condenser',val:'5.0 m²'}]},
+  {id:'PRO2-ANFD300-006',name:'Agitated Nutsche Filter Dryer 300L',type:'ANFD',cap:'300 KL',moc:'SS316',jacket:'—',agit:"'S' Type Blade",loc:'Crystal - III',extra:{rpm:'—',temp:'—',pressure:'—',motor:'—',utilities:'—',maintDate:''},custom:[]},
+];
+
+let recipeData=[
+  // ── Abemaciclib Stage-I (AKNA) ──
+  {prod:'Abemaciclib',stage:'Stage-I (AKNA)',prodCode:'3010001323',inputQty:32,outputQty:33.6,size:32,time:140,steps:[
+    {desc:'Reaction Monitoring',equipIds:['SSR1500-008'],minVol:160,maxVol:230,hrs:48},
+    {desc:'Charcoalization',equipIds:['GLR1600-015','GLR1600-016'],minVol:710,maxVol:1030,hrs:2},
+    {desc:'Filtration',equipIds:['SSR1500-008','GLR1600-015','GLR1600-016'],minVol:1030,maxVol:1158,hrs:1},
+    {desc:'Work Up',equipIds:['SSR1500-008','GLR1600-015','GLR1600-016'],minVol:658,maxVol:818,hrs:8},
+    {desc:'Charcoalization',equipIds:['GLR1600-015','GLR1600-016'],minVol:818,maxVol:850,hrs:3},
+    {desc:'Distillation',equipIds:['SSR500-007','GLR630-017'],minVol:350,maxVol:670,hrs:10},
+    {desc:'Filtration & Drying',equipIds:['ANFD300-008','ANFD200-009'],minVol:null,maxVol:'30 Kg',hrs:30},
+    {desc:'Slurrification',equipIds:['GLR630-017','SSR500-007'],minVol:165,maxVol:180,hrs:8},
+    {desc:'Filtration & Drying',equipIds:['ANFD300-008','ANFD200-009'],minVol:null,maxVol:'30 Kg',hrs:30},
+  ],yield:0},
+
+  // ── Abemaciclib Stage-II (AKNB) ──
+  {prod:'Abemaciclib',stage:'Stage-II (AKNB)',prodCode:'3010001324',inputQty:33.6,outputQty:28.56,size:33.6,time:84,steps:[
+    {desc:'Reaction Monitoring',equipIds:['SSR500-007','SSR1500-008'],minVol:336,maxVol:412,hrs:24},
+    {desc:'Work Up',equipIds:['SSR500-007','SSR1500-008'],minVol:748,maxVol:1084,hrs:12},
+    {desc:'Distillation',equipIds:['GLR1600-016','GLR630-017','GLR630-018'],minVol:815,maxVol:412,hrs:16},
+    {desc:'Slurrification',equipIds:['GLR1600-016','GLR630-017','GLR630-018'],minVol:412,maxVol:513,hrs:8},
+    {desc:'Filtration & Drying',equipIds:['ANFD300-008','ANFD200-009'],minVol:null,maxVol:'31 Kg',hrs:24},
+  ],yield:0},
+
+  // ── Abirateron Acetate (AIOZ) ──
+  {prod:'Abirateron Acetate',stage:'Stage-I (AIOZ)',prodCode:'1010004001',inputQty:100,outputQty:110,size:100,time:170,steps:[
+    {desc:'Reaction Monitoring + 1st Layer Separation',equipIds:['SSR3000-001','SSR2000-005','SSR2000-002'],minVol:500,maxVol:630,hrs:15},
+    {desc:'Extraction + Sodium Bicarbonate Wash',equipIds:['SSR3000-001','SSR2000-005','SSR2000-002'],minVol:671,maxVol:871,hrs:15},
+    {desc:'Distillation, Charcoalization & Filtration',equipIds:['SSR3000-001','SSR2000-005','SSR2000-002'],minVol:171,maxVol:1671,hrs:28},
+    {desc:'Crystallization',equipIds:['HSR2000-001'],minVol:1671,maxVol:2871,hrs:12},
+    {desc:'Filtration & Drying',equipIds:['ANFD300-008','ANFD200-009'],minVol:null,maxVol:'110 Kg',hrs:50},
+    {desc:'Micronization',equipIds:['JTM8-001'],minVol:null,maxVol:'110 Kg',hrs:50},
+  ],yield:0},
+];
+
+let batchData=[];
+
+let yieldData=[];
+
+// ══════════════════════════════════════
+// RENDER EQUIPMENT — Location grouped cards
+// ══════════════════════════════════════
+const TYPE_COLORS={
+  'Reactor':        {bg:'#eff4ff',border:'#bfcfff',text:'#1a56db'},
+  'GL Reactor':     {bg:'#eff4ff',border:'#bfcfff',text:'#1a56db'},
+  'Hastelloy Reactor':{bg:'#fdf4ff',border:'#e9d5ff',text:'#7c3aed'},
+  'ANFD':           {bg:'#ecfdf5',border:'#6ee7b7',text:'#059669'},
+  'PNF':            {bg:'#f0fdf4',border:'#bbf7d0',text:'#16a34a'},
+  'VTD':            {bg:'#fff7ed',border:'#fed7aa',text:'#c2410c'},
+  'Centrifuge':     {bg:'#fefce8',border:'#fde047',text:'#854d0e'},
+  'Sparkler Filter':{bg:'#f0f9ff',border:'#bae6fd',text:'#0369a1'},
+  'Co-Mill':        {bg:'#fdf2f8',border:'#f0abfc',text:'#86198f'},
+  'default':        {bg:'var(--bg3)',border:'var(--border)',text:'var(--text2)'},
+};
+
+function getTypeColor(type){
+  return TYPE_COLORS[type]||TYPE_COLORS['default'];
+}
+
+function renderEquipment(){
+  const filterType=document.getElementById('eq-filter-type')?.value||'ALL';
+  const filtered=filterType==='ALL'?equipmentData:
+    filterType==='Reactor'
+      ? equipmentData.filter(e=>['Reactor','GL Reactor','Hastelloy Reactor'].includes(e.type))
+      : equipmentData.filter(e=>e.type===filterType);
+
+  // Group by location
+  const grouped={};
+  filtered.forEach((e,origIdx)=>{
+    const loc=e.loc||'Other';
+    if(!grouped[loc]) grouped[loc]=[];
+    grouped[loc].push({...e,_origIdx:equipmentData.indexOf(e)});
+  });
+
+  const container=document.getElementById('equip-grouped-view');
+  if(!container) return;
+
+  if(filtered.length===0){
+    container.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">No equipment found for selected filter.</div>';
+  } else {
+    let html='';
+    const locationOrder=['Second Floor','First Floor','Ground Floor','Charcoalization','Crystal - I','Crystal - II','Crystal - III'];
+    const allLocs=[...new Set([...locationOrder.filter(l=>grouped[l]),...Object.keys(grouped)])];
+
+    allLocs.forEach(loc=>{
+      if(!grouped[loc]) return;
+      const items=grouped[loc];
+      const cards=items.map(e=>{
+        const tc=getTypeColor(e.type);
+        // extra details rows
+        const extraRows=[];
+        if(e.extra?.rpm&&e.extra.rpm!=='—') extraRows.push(['RPM',e.extra.rpm]);
+        if(e.extra?.pressure&&e.extra.pressure!=='—') extraRows.push(['Pressure',e.extra.pressure]);
+        if(e.extra?.temp&&e.extra.temp!=='—') extraRows.push(['Temp',e.extra.temp]);
+        if(e.extra?.motor&&e.extra.motor!=='—') extraRows.push(['Motor',e.extra.motor]);
+        if(e.extra?.utilities&&e.extra.utilities!=='—') extraRows.push(['Utilities',e.extra.utilities]);
+        if(e.extra?.maintDate&&e.extra.maintDate!=='—'&&e.extra.maintDate) extraRows.push(['Last Maint.',e.extra.maintDate]);
+        (e.custom||[]).forEach(c=>extraRows.push([c.label,c.val]));
+
+        const extraHtml=extraRows.map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;color:var(--text3);font-weight:500;">${k}</span>
+            <span style="font-size:11px;color:var(--text);font-family:var(--mono);">${v}</span>
+          </div>`).join('');
+
+        const hasExtra=extraRows.length>0;
+        const eid='eq-extra-'+e._origIdx;
+
+        return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(26,86,219,0.1)'" onmouseout="this.style.boxShadow='var(--shadow)'">
+          <!-- Card Header -->
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);">${e.id}</span>
+            <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:${tc.bg};color:${tc.text};border:1px solid ${tc.border};white-space:nowrap;">${e.type}</span>
+          </div>
+          <!-- Card Body -->
+          <div style="padding:12px 14px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.3;">${e.name}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+              <div><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;">Capacity</div>
+                <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);">${e.cap}</div></div>
+              <div><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;">MOC</div>
+                <div style="font-size:12px;color:var(--text);">${e.moc}</div></div>
+              <div><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;">Agitator</div>
+                <div style="font-size:12px;color:var(--text2);">${e.agit||'—'}</div></div>
+              <div><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;">Jacket</div>
+                <div style="font-size:12px;color:var(--text2);">${e.jacket||'—'}</div></div>
+            </div>
+            <!-- Expandable extra details -->
+            ${hasExtra?`
+            <div id="${eid}" style="display:none;border-top:1px solid var(--border);padding-top:8px;margin-bottom:8px;">
+              ${extraHtml}
+            </div>
+            <button onclick="toggleEquipExtra('${eid}',this)" style="width:100%;padding:5px;font-size:11px;font-weight:500;color:var(--accent);background:var(--accentbg);border:1px solid var(--accentborder);border-radius:4px;cursor:pointer;margin-bottom:8px;">▼ Show Details</button>
+            `:''}
+            <div style="display:flex;gap:6px;">
+              <button class="btn" onclick="openEditEquip(${e._origIdx})" style="padding:4px 10px;font-size:11px;flex:1;color:var(--accent);border-color:var(--accentborder);">✎ Edit</button>
+              <button class="btn danger" onclick="deleteEquip(${e._origIdx})" style="padding:4px 10px;font-size:11px;flex:1;">Delete</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      html+=`<div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${loc}</div>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <div style="font-size:11px;font-weight:500;color:var(--text3);">${items.length} equipment</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+          ${cards}
+        </div>
+      </div>`;
+    });
+    container.innerHTML=html;
+  }
+
+  // update stats
+  document.getElementById('eq-total').textContent=equipmentData.length;
+  document.getElementById('eq-reactors').textContent=equipmentData.filter(e=>['Reactor','GL Reactor','Hastelloy Reactor'].includes(e.type)).length;
+  document.getElementById('eq-centrifuges').textContent=equipmentData.filter(e=>e.type==='ANFD'||e.type==='PNF'||e.type==='Centrifuge').length;
+  document.getElementById('eq-dryers').textContent=equipmentData.filter(e=>e.type==='VTD').length;
+  document.getElementById('eq-recipes').textContent=recipeData.length;
+  const sel=document.getElementById('map-recipe-sel');
+  if(sel) sel.innerHTML=recipeData.map((r,i)=>`<option value="${i}">${r.prod} — ${r.stage}</option>`).join('');
+}
+
+function toggleEquipExtra(eid,btn){
+  const el=document.getElementById(eid);
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  btn.textContent=open?'▲ Hide Details':'▼ Show Details';
+  btn.style.background=open?'var(--bg3)':'var(--accentbg)';
+}
+function deleteEquip(i){
+  if(confirm('Delete equipment "'+equipmentData[i].id+'" from master?')){
+    const id=equipmentData[i].id;
+    // remove from recipe steps (not equipIds which doesn't exist)
+    recipeData.forEach(r=>{
+      (r.steps||[]).forEach(s=>{
+        s.equipIds=(s.equipIds||[]).filter(eid=>!idsMatch(eid,id));
+      });
+    });
+    equipmentData.splice(i,1);
+    renderEquipment();renderRecipes();
+  }
+}
+let editEquipIdx=-1;
+
+function openEditEquip(idx){
+  editEquipIdx=idx;
+  const e=equipmentData[idx];
+  document.getElementById('equip-modal-title').textContent='Edit Equipment — '+e.id;
+  document.getElementById('equip-modal-save-btn').textContent='Save Changes';
+  document.getElementById('ne-id').value=e.id;
+  document.getElementById('ne-name').value=e.name;
+  document.getElementById('ne-type').value=e.type;
+  document.getElementById('ne-cap').value=e.cap||'';
+  document.getElementById('ne-moc').value=e.moc||'';
+  // set jacket & agit selects safely
+  const jSel=document.getElementById('ne-jacket');
+  const aSel=document.getElementById('ne-agit');
+  [...jSel.options].forEach(o=>{if(o.value===e.jacket)o.selected=true;});
+  [...aSel.options].forEach(o=>{if(o.value===e.agit)o.selected=true;});
+  document.getElementById('ne-loc').value=e.loc||'';
+  // extra fields
+  const ex=e.extra||{};
+  document.getElementById('ne-pressure').value=ex.pressure||'';
+  document.getElementById('ne-temp').value=ex.temp||'';
+  document.getElementById('ne-rpm').value=ex.rpm||'';
+  document.getElementById('ne-motor').value=ex.motor||'';
+  document.getElementById('ne-utilities').value=ex.utilities||'';
+  document.getElementById('ne-maint-date').value=ex.maintDate||'';
+  // open extra section if data exists
+  const hasExtra=Object.values(ex).some(v=>v&&v!=='—'&&v!=='')|| (e.custom||[]).length>0;
+  document.getElementById('extra-fields-body').classList.toggle('open',hasExtra);
+  document.getElementById('extra-toggle-icon').textContent=hasExtra?'−':'＋';
+  // custom fields
+  customFieldCount=0;
+  document.getElementById('custom-fields-list').innerHTML='';
+  (e.custom||[]).forEach(c=>{
+    customFieldCount++;
+    const n=customFieldCount;
+    const div=document.createElement('div');
+    div.className='extra-field-row'; div.id='cf-row-'+n;
+    div.innerHTML=`
+      <input placeholder="Field label" id="cf-label-${n}" value="${(c.label||'').replace(/"/g,'&quot;')}"/>
+      <input placeholder="Value" id="cf-val-${n}" value="${(c.val||'').replace(/"/g,'&quot;')}"/>
+      <button class="btn danger" onclick="document.getElementById('cf-row-${n}').remove()" style="padding:6px 10px;font-size:11px;">✕</button>`;
+    document.getElementById('custom-fields-list').appendChild(div);
+  });
+  openModal('modal-add-equip');
+}
+
+function resetEquipModal(){
+  editEquipIdx=-1;
+  document.getElementById('equip-modal-title').textContent='Add Equipment — Master Data';
+  document.getElementById('equip-modal-save-btn').textContent='Add to Master';
+  ['ne-id','ne-name','ne-cap','ne-moc','ne-loc','ne-pressure','ne-temp','ne-rpm','ne-motor','ne-utilities','ne-maint-date'].forEach(f=>{
+    const el=document.getElementById(f);if(el)el.value='';
+  });
+  document.getElementById('custom-fields-list').innerHTML='';
+  document.getElementById('extra-fields-body').classList.remove('open');
+  document.getElementById('extra-toggle-icon').textContent='＋';
+  customFieldCount=0;
+}
+
+function addEquipment(){
+  const id=document.getElementById('ne-id').value.trim();
+  const name=document.getElementById('ne-name').value.trim();
+  if(!id||!name){alert('Equipment ID and Name required.');return;}
+  // gather custom fields
+  const custom=[];
+  document.querySelectorAll('#custom-fields-list .extra-field-row').forEach(row=>{
+    const n=row.id.replace('cf-row-','');
+    const lbl=document.getElementById('cf-label-'+n)?.value?.trim();
+    const val=document.getElementById('cf-val-'+n)?.value?.trim();
+    if(lbl) custom.push({label:lbl,val:val||'—'});
+  });
+  const equipObj={
+    id,name,
+    type:document.getElementById('ne-type').value,
+    cap:document.getElementById('ne-cap').value||'—',
+    moc:document.getElementById('ne-moc').value||'—',
+    jacket:document.getElementById('ne-jacket').value,
+    agit:document.getElementById('ne-agit').value,
+    loc:document.getElementById('ne-loc').value||'—',
+    extra:{
+      pressure:document.getElementById('ne-pressure').value,
+      temp:document.getElementById('ne-temp').value,
+      rpm:document.getElementById('ne-rpm').value,
+      motor:document.getElementById('ne-motor').value,
+      utilities:document.getElementById('ne-utilities').value,
+      maintDate:document.getElementById('ne-maint-date').value,
+    },
+    custom,
+  };
+  if(editEquipIdx>=0){
+    // EDIT MODE — update in place
+    equipmentData[editEquipIdx]=equipObj;
+  } else {
+    // ADD MODE — duplicate ID check
+    if(equipmentData.find(e=>e.id===id)){alert('Equipment ID "'+id+'" already exists.');return;}
+    equipmentData.push(equipObj);
+  }
+  renderEquipment();
+  closeModal('modal-add-equip');
+  resetEquipModal();
+}
+
+// ══════════════════════════════════════
+// STEP-WISE RECIPE BUILDER
+// ══════════════════════════════════════
+let recipeStepCount=0;
+let editRecipeProdStage=null; // null=add mode, {prod,stage}=edit mode
+
+function openRecipeModal(){
+  editRecipeProdStage=null;
+  document.getElementById('recipe-modal-title').textContent='Add Recipe';
+  document.getElementById('recipe-modal-save-btn').textContent='Save Recipe';
+  recipeStepCount=0;
+  document.getElementById('nr-steps-list').innerHTML='';
+  document.getElementById('nr-steps-empty').style.display='block';
+  ['nr-prod','nr-stage','nr-size','nr-time','nr-yield'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  openModal('modal-add-recipe');
+}
+
+function openEditRecipe(prod, stage){
+  const r=recipeData.find(r=>r.prod===prod&&r.stage===stage);
+  if(!r){alert('Recipe not found.');return;}
+  editRecipeProdStage={prod,stage};
+  document.getElementById('recipe-modal-title').textContent='Edit Recipe — '+prod+' / '+stage;
+  document.getElementById('recipe-modal-save-btn').textContent='Save Changes';
+  // fill basic fields
+  document.getElementById('nr-prod').value=r.prod;
+  document.getElementById('nr-stage').value=r.stage;
+  document.getElementById('nr-size').value=r.inputQty||r.size||'';
+  document.getElementById('nr-time').value=r.time||'';
+  document.getElementById('nr-yield').value=r.yield||'';
+  // rebuild operations list
+  recipeStepCount=0;
+  document.getElementById('nr-steps-list').innerHTML='';
+  document.getElementById('nr-steps-empty').style.display='none';
+  (r.steps||[]).forEach(s=>{
+    recipeStepCount++;
+    const n=recipeStepCount;
+    const options=equipmentData.map(e=>
+      `<option value="${e.id}" ${(s.equipIds||[]).includes(e.id)?'selected':''}>${e.id} — ${e.name} (${e.type})</option>`
+    ).join('');
+    const row=document.createElement('div');
+    row.id='recipe-step-row-'+n;
+    row.style.cssText='display:grid;grid-template-columns:32px 1fr 220px 36px;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);align-items:start;background:var(--bg2);';
+    row.innerHTML=`
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text3);padding-top:8px;font-weight:600;">${n}</span>
+      <input id="rs-desc-${n}" value="${(s.desc||'').replace(/"/g,'&quot;')}" style="font-size:13px;"/>
+      <div>
+        <select id="rs-equip-${n}" multiple size="4"
+          style="width:100%;min-height:90px;max-height:120px;font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:var(--bg2);color:var(--text);cursor:pointer;"
+          title="Hold Ctrl/Cmd to select multiple"
+          onchange="updateStepEquipSummary(${n})">
+          ${options}
+        </select>
+        <div id="rs-equip-summary-${n}" style="font-size:10px;color:var(--accent);margin-top:3px;font-family:var(--mono);min-height:14px;">${(s.equipIds||[]).join(' + ')}</div>
+      </div>
+      <button type="button" onclick="removeRecipeStep(${n})"
+        style="padding:6px 8px;font-size:12px;border:1px solid var(--dangerborder);background:var(--bg2);color:var(--danger);border-radius:6px;cursor:pointer;margin-top:1px;">✕</button>
+    `;
+    document.getElementById('nr-steps-list').appendChild(row);
+    // pre-fill IPC checks for this step
+    (s.ipcChecks||[]).forEach(ic=>{
+      ipcCheckCount++;
+      const icN=ipcCheckCount;
+      const list=document.getElementById('rs-ipc-list-'+n);
+      const empty=document.getElementById('rs-ipc-empty-'+n);
+      if(empty) empty.style.display='none';
+      const div=document.createElement('div');
+      div.id='rs-ipc-row-'+icN;
+      div.style.cssText='display:grid;grid-template-columns:1fr 1fr 28px;gap:6px;padding:5px 8px;border-bottom:1px solid var(--border);align-items:center;background:var(--bg2);';
+      div.innerHTML=`
+        <input id="rs-ipc-param-${icN}" value="${(ic.param||'').replace(/"/g,'&quot;')}" placeholder="Parameter" style="font-size:12px;padding:5px 8px;"/>
+        <input id="rs-ipc-spec-${icN}" value="${(ic.spec||'').replace(/"/g,'&quot;')}" placeholder="Specification" style="font-size:12px;padding:5px 8px;"/>
+        <button type="button" onclick="removeIpcFromStep(${n},${icN})" style="padding:4px 6px;font-size:11px;border:1px solid var(--dangerborder);background:var(--bg2);color:var(--danger);border-radius:4px;cursor:pointer;">✕</button>
+      `;
+      list.appendChild(div);
+    });
+  });
+  openModal('modal-add-recipe');
+}
+
+function addRecipeStep(){
+  recipeStepCount++;
+  const n=recipeStepCount;
+  const emptyEl=document.getElementById('nr-steps-empty');
+  if(emptyEl) emptyEl.style.display='none';
+
+  // build equipment options from master
+  const options=equipmentData.map(e=>
+    `<option value="${e.id}">${e.id} — ${e.name} (${e.type})</option>`
+  ).join('');
+
+  const row=document.createElement('div');
+  row.id='recipe-step-row-'+n;
+  row.style.cssText='border-bottom:1px solid var(--border);background:var(--bg2);';
+  row.innerHTML=`
+    <div style="display:grid;grid-template-columns:32px 1fr 220px 36px;gap:8px;padding:8px 10px;align-items:start;">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text3);padding-top:8px;font-weight:600;">${n}</span>
+      <input id="rs-desc-${n}" placeholder="e.g. Batch Charging & Reaction Monitoring" style="font-size:13px;"/>
+      <div>
+        <select id="rs-equip-${n}" multiple size="4"
+          style="width:100%;min-height:90px;max-height:120px;font-size:11px;padding:4px 6px;border:1px solid var(--border2);border-radius:6px;background:var(--bg2);color:var(--text);cursor:pointer;"
+          title="Hold Ctrl/Cmd to select multiple"
+          onchange="updateStepEquipSummary(${n})">
+          ${options}
+        </select>
+        <div id="rs-equip-summary-${n}" style="font-size:10px;color:var(--accent);margin-top:3px;font-family:var(--mono);min-height:14px;"></div>
+      </div>
+      <button type="button" onclick="removeRecipeStep(${n})"
+        style="padding:6px 8px;font-size:12px;border:1px solid var(--dangerborder);background:var(--bg2);color:var(--danger);border-radius:6px;cursor:pointer;margin-top:1px;">✕</button>
+    </div>
+    <!-- IPC checks for this operation -->
+    <div style="margin:0 10px 8px 42px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--bg4);border-bottom:1px solid var(--border);">
+        <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">IPC Checks for this operation</span>
+        <button type="button" onclick="addIpcToStep(${n})" style="font-size:10px;padding:2px 8px;border:1px solid var(--accentborder);background:var(--accentbg);color:var(--accent);border-radius:4px;cursor:pointer;font-weight:600;">+ Add IPC</button>
+      </div>
+      <div id="rs-ipc-list-${n}">
+        <div id="rs-ipc-empty-${n}" style="padding:8px 10px;font-size:11px;color:var(--text3);">No IPC checks — click "+ Add IPC" to add</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('nr-steps-list').appendChild(row);
+}
+
+function updateStepEquipSummary(n){
+  const sel=document.getElementById('rs-equip-'+n);
+  const selected=[...sel.selectedOptions].map(o=>o.value);
+  const summary=document.getElementById('rs-equip-summary-'+n);
+  summary.textContent=selected.length?selected.join(' + '):'';
+}
+
+function removeRecipeStep(n){
+  const row=document.getElementById('recipe-step-row-'+n);
+  if(row) row.remove();
+  // if no steps left, show empty state
+  if(document.getElementById('nr-steps-list').children.length===0){
+    document.getElementById('nr-steps-empty').style.display='block';
+  }
+  // re-number visible steps
+  let idx=1;
+  document.querySelectorAll('#nr-steps-list > div').forEach(r=>{
+    r.querySelector('span').textContent=idx++;
+  });
+}
+
+let ipcCheckCount=0;
+function addIpcToStep(stepN){
+  ipcCheckCount++;
+  const ic=ipcCheckCount;
+  const list=document.getElementById('rs-ipc-list-'+stepN);
+  const empty=document.getElementById('rs-ipc-empty-'+stepN);
+  if(empty) empty.style.display='none';
+  const div=document.createElement('div');
+  div.id='rs-ipc-row-'+ic;
+  div.style.cssText='display:grid;grid-template-columns:1fr 1fr 28px;gap:6px;padding:5px 8px;border-bottom:1px solid var(--border);align-items:center;background:var(--bg2);';
+  div.innerHTML=`
+    <input id="rs-ipc-param-${ic}" placeholder="Parameter (e.g. pH)" style="font-size:12px;padding:5px 8px;"/>
+    <input id="rs-ipc-spec-${ic}" placeholder="Specification (e.g. 4.5–5.0)" style="font-size:12px;padding:5px 8px;"/>
+    <button type="button" onclick="removeIpcFromStep(${stepN},${ic})" style="padding:4px 6px;font-size:11px;border:1px solid var(--dangerborder);background:var(--bg2);color:var(--danger);border-radius:4px;cursor:pointer;">✕</button>
+  `;
+  list.appendChild(div);
+}
+function removeIpcFromStep(stepN,ic){
+  const row=document.getElementById('rs-ipc-row-'+ic);
+  if(row) row.remove();
+  const list=document.getElementById('rs-ipc-list-'+stepN);
+  if(list&&list.querySelectorAll('[id^="rs-ipc-row-"]').length===0){
+    const empty=document.getElementById('rs-ipc-empty-'+stepN);
+    if(empty) empty.style.display='block';
+  }
+}
+
+function getRecipeSteps(){
+  const steps=[];
+  document.querySelectorAll('#nr-steps-list > div').forEach(row=>{
+    const n=row.id.replace('recipe-step-row-','');
+    const desc=document.getElementById('rs-desc-'+n)?.value?.trim()||'';
+    const sel=document.getElementById('rs-equip-'+n);
+    const equipIds=sel?[...sel.selectedOptions].map(o=>o.value):[];
+    // collect IPC checks
+    const ipcChecks=[];
+    row.querySelectorAll('[id^="rs-ipc-row-"]').forEach(ipcRow=>{
+      const ic=ipcRow.id.replace('rs-ipc-row-','');
+      const param=document.getElementById('rs-ipc-param-'+ic)?.value?.trim();
+      const spec=document.getElementById('rs-ipc-spec-'+ic)?.value?.trim();
+      if(param) ipcChecks.push({param,spec:spec||'—'});
+    });
+    if(desc) steps.push({desc,equipIds,ipcChecks});
+  });
+  return steps;
+}
+
+// ══════════════════════════════════════
+// RENDER RECIPES — Product-grouped
+// ══════════════════════════════════════
+function renderRecipes(){
+  const grid=document.getElementById('recipe-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+
+  const grouped={};
+  recipeData.forEach(r=>{
+    if(!grouped[r.prod]) grouped[r.prod]=[];
+    grouped[r.prod].push(r);
+  });
+
+  if(Object.keys(grouped).length===0){
+    grid.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;">No recipes added yet. Click "+ Add Recipe" to start.</div>';
+    return;
+  }
+
+  Object.entries(grouped).forEach(([prod,stages])=>{
+    const allEquipIds=[...new Set(stages.flatMap(r=>(r.steps||[]).flatMap(s=>s.equipIds||[])))];
+    const equipPills=allEquipIds.map(id=>
+      `<span style="font-size:10px;font-weight:500;color:var(--accent);background:var(--accentbg);border:1px solid var(--accentborder);border-radius:4px;padding:2px 7px;font-family:var(--mono);">${id}</span>`
+    ).join(' ');
+
+    const stageCards=stages.map(r=>{
+      const opRows=(r.steps||[]).map((s,si)=>{
+        const eqBadges=(s.equipIds||[]).length
+          ? (s.equipIds||[]).map(id=>
+              `<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);background:var(--accentbg);border:1px solid var(--accentborder);border-radius:3px;padding:2px 6px;display:inline-block;margin:1px;">${id}</span>`
+            ).join('')
+          : '<span style="font-size:11px;color:var(--text3);">—</span>';
+
+        const volText=(s.minVol!=null||s.maxVol!=null)
+          ? `${s.minVol!=null?s.minVol+'–':''}${s.maxVol} L`
+          : null;
+        const metaBits=[];
+        if(volText) metaBits.push(`<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">📦 ${volText}</span>`);
+        if(s.hrs)   metaBits.push(`<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--warn);">⏱ ${s.hrs}h</span>`);
+
+        return `<div style="padding:10px 12px;border-bottom:1px solid var(--border);background:var(--bg2);">
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+            <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 6px;flex-shrink:0;margin-top:1px;">${si+1}</span>
+            <span style="font-size:13px;font-weight:500;color:var(--text);line-height:1.4;">${s.desc}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:${metaBits.length?'6px':'0'};">${eqBadges}</div>
+          ${metaBits.length?`<div style="display:flex;gap:12px;flex-wrap:wrap;">${metaBits.join('')}</div>`:''}
+        </div>`;
+      }).join('');
+
+      const prodCode=r.prodCode?`<span style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px;display:block;">${r.prodCode}</span>`:'';
+      const metaItems=[
+        r.inputQty!=null?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Input</div><div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">${r.inputQty} Kg</div></div>`:'',
+        r.outputQty!=null?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Output</div><div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--success);">${r.outputQty} Kg</div></div>`:'',
+        r.time?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Cycle</div><div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--warn);">${r.time}h</div></div>`:'',
+        r.yield?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Th. Yield</div><div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);">${r.yield}%</div></div>`:'',
+      ].filter(Boolean).join('');
+
+      return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+        <!-- Stage header -->
+        <div style="padding:10px 12px;background:var(--accentbg);border-bottom:1px solid var(--accentborder);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent);">${r.stage}</div>
+            ${prodCode}
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="btn" onclick="openEditRecipe('${r.prod.replace(/'/g,"\\'")}','${r.stage.replace(/'/g,"\\'")}');" style="padding:4px 10px;font-size:11px;color:var(--accent);border-color:var(--accentborder);">✎ Edit</button>
+            <button class="btn danger" onclick="deleteRecipe('${r.prod.replace(/'/g,"\\'")}','${r.stage.replace(/'/g,"\\'")}');" style="padding:4px 8px;font-size:11px;">✕</button>
+          </div>
+        </div>
+        <!-- Meta row -->
+        ${metaItems?`<div style="display:flex;justify-content:space-around;padding:10px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;">${metaItems}</div>`:''}
+        <!-- Operations label -->
+        <div style="padding:6px 12px;background:var(--bg3);border-bottom:1px solid var(--border);">
+          <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;">Operations</span>
+        </div>
+        <!-- Operation rows -->
+        ${opRows||'<div style="padding:16px 12px;font-size:12px;color:var(--text3);">No operations defined.</div>'}
+      </div>`;
+    }).join('');
+
+    grid.innerHTML+=`<div class="card" style="margin-bottom:16px;padding:14px;">
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">⬡ ${prod}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+          <span style="font-size:11px;color:var(--text3);margin-right:2px;">${stages.length} stage${stages.length>1?'s':''} · Equipment:</span>
+          ${equipPills||'<span style="font-size:11px;color:var(--text3);">none linked</span>'}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${stageCards}
+      </div>
+    </div>`;
+  });
+}
+function deleteRecipe(prod,stage){
+  if(confirm('Delete "'+stage+'" recipe for "'+prod+'"?')){
+    const i=recipeData.findIndex(r=>r.prod===prod&&r.stage===stage);
+    if(i>-1){recipeData.splice(i,1);renderRecipes();renderEquipment();}
+  }
+}
+function addRecipe(){
+  const prod=document.getElementById('nr-prod').value.trim();
+  const stage=document.getElementById('nr-stage').value.trim();
+  if(!prod){alert('Product name required.');return;}
+  if(!stage){alert('Stage name required.');return;}
+  const steps=getRecipeSteps();
+  if(steps.length===0){alert('Add at least one operation.');return;}
+  const recipeObj={
+    prod, stage,
+    inputQty:parseFloat(document.getElementById('nr-size').value)||0,
+    outputQty:null,
+    size:parseFloat(document.getElementById('nr-size').value)||0,
+    time:parseFloat(document.getElementById('nr-time').value)||0,
+    steps,
+    yield:parseFloat(document.getElementById('nr-yield').value)||0,
+  };
+  if(editRecipeProdStage){
+    // EDIT MODE — find and replace
+    const idx=recipeData.findIndex(r=>r.prod===editRecipeProdStage.prod&&r.stage===editRecipeProdStage.stage);
+    if(idx>-1){
+      // preserve extra fields like prodCode, inputQty, outputQty from original
+      const orig=recipeData[idx];
+      recipeData[idx]={...orig,...recipeObj,prodCode:orig.prodCode,outputQty:orig.outputQty};
+    }
+  } else {
+    // ADD MODE — duplicate check
+    if(recipeData.find(r=>r.prod===prod&&r.stage===stage)){
+      alert('"'+prod+'" — "'+stage+'" already exists. Use a different stage name.');return;
+    }
+    recipeData.push(recipeObj);
+  }
+  renderRecipes();renderEquipment();
+  closeModal('modal-add-recipe');
+  editRecipeProdStage=null;
+  recipeStepCount=0;
+  document.getElementById('nr-steps-list').innerHTML='';
+  document.getElementById('nr-steps-empty').style.display='block';
+  ['nr-prod','nr-stage','nr-size','nr-time','nr-yield'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+}
+
+// ── ID normalization — strip PRO2- prefix for matching ──
+function normalizeId(id){return (id||'').replace(/^PRO2-/i,'').trim();}
+function idsMatch(a,b){return normalizeId(a)===normalizeId(b);}
+
+// ══════════════════════════════════════
+// EQUIPMENT MATRIX (auto from recipes)
+// ══════════════════════════════════════
+function renderMatrix(){
+  const container=document.getElementById('matrix-container');
+  if(!container)return;
+  if(recipeData.length===0||equipmentData.length===0){
+    container.innerHTML='<div style="padding:24px;color:var(--text3);font-size:13px;">No recipes or equipment data to build matrix.</div>';
+    return;
+  }
+  const usedRecipeIds=[...new Set(recipeData.flatMap(r=>(r.steps||[]).flatMap(s=>s.equipIds||[])))];
+  const usedEquip=equipmentData.filter(e=>usedRecipeIds.some(rid=>idsMatch(e.id,rid)));
+
+  if(usedEquip.length===0){
+    container.innerHTML='<div style="padding:24px;color:var(--text3);font-size:13px;">No equipment matched. Recipe IDs and Equipment Master IDs are being compared without PRO2- prefix automatically.</div>';
+    return;
+  }
+
+  let html=`<table class="matrix-table">
+    <thead><tr>
+      <th style="min-width:130px;">Product</th>
+      <th style="min-width:110px;">Stage</th>
+      ${usedEquip.map(e=>`<th class="eq-col" title="${e.name} — ${e.type} — ${e.loc}">${normalizeId(e.id)}</th>`).join('')}
+    </tr></thead>
+    <tbody>`;
+
+  recipeData.forEach(r=>{
+    html+=`<tr>
+      <td style="font-weight:600;">${r.prod}</td>
+      <td style="color:var(--text2);font-size:11px;">${r.stage}</td>`;
+    usedEquip.forEach(e=>{
+      const used=(r.steps||[]).some(s=>(s.equipIds||[]).some(rid=>idsMatch(e.id,rid)));
+      html+=`<td style="text-align:center;padding:8px 4px;">
+        ${used
+          ?`<span class="matrix-cell-tick primary" title="${normalizeId(e.id)} — ${r.prod} / ${r.stage}">✔</span>`
+          :'<span style="color:var(--border2);display:block;text-align:center;">—</span>'}
+      </td>`;
+    });
+    html+='</tr>';
+  });
+
+  html+=`<tr style="background:var(--bg3);">
+    <td colspan="2" style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;padding:8px 12px;">USAGE COUNT</td>`;
+  usedEquip.forEach(e=>{
+    const count=recipeData.filter(r=>(r.steps||[]).some(s=>(s.equipIds||[]).some(rid=>idsMatch(e.id,rid)))).length;
+    html+=`<td style="text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;color:${count>1?'var(--warn)':'var(--text3)'};">${count}</td>`;
+  });
+  html+=`</tr></tbody></table>`;
+  container.innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// EQUIPMENT MAPPING
+// ══════════════════════════════════════
+function generateMapping(){
+  const sel=document.getElementById('map-recipe-sel');
+  if(!sel) return;
+
+  // repopulate dropdown every time
+  const prevVal=sel.value;
+  sel.innerHTML=recipeData.map((r,i)=>`<option value="${i}">${r.prod} — ${r.stage}</option>`).join('');
+  if(prevVal) sel.value=prevVal;
+
+  const idx=parseInt(sel.value);
+  const batchSize=parseFloat(document.getElementById('map-batch-size').value)||500;
+  const r=recipeData[idx];
+  if(!r){document.getElementById('mapping-result').innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;">Select a product/stage above.</div>';return;}
+
+  const allEquipIds=[...new Set((r.steps||[]).flatMap(s=>s.equipIds||[]))];
+  const linkedEquip=equipmentData.filter(e=>allEquipIds.some(rid=>idsMatch(e.id,rid)));
+
+  // build per-operation breakdown
+  const opRows=(r.steps||[]).map((s,si)=>{
+    const eqBadges=(s.equipIds||[]).map(id=>{
+      const eq=equipmentData.find(e=>idsMatch(e.id,id));
+      return `<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);background:var(--accentbg);border:1px solid var(--accentborder);border-radius:3px;padding:2px 6px;">${normalizeId(id)}${eq?' ('+eq.cap+')':''}</span>`;
+    }).join(' ');
+    return `<tr>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;">${si+1}</td>
+      <td style="font-size:12px;font-weight:500;">${s.desc}</td>
+      <td>${eqBadges||'<span style="color:var(--text3);font-size:11px;">—</span>'}</td>
+      <td style="font-family:var(--mono);font-size:11px;text-align:center;color:var(--warn);">${s.hrs?s.hrs+'h':'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // equipment summary table
+  let eqRows='';
+  if(linkedEquip.length){
+    linkedEquip.forEach(e=>{
+      eqRows+=`<tr>
+        <td style="font-family:var(--mono);font-weight:700;color:var(--accent);font-size:12px;">${normalizeId(e.id)}</td>
+        <td style="font-size:12px;">${e.name}</td>
+        <td style="font-size:11px;color:var(--text2);">${e.type}</td>
+        <td style="font-family:var(--mono);font-size:11px;">${e.cap}</td>
+        <td style="font-size:11px;">${e.moc}</td>
+        <td style="font-size:11px;color:var(--text2);">${e.loc||'—'}</td>
+      </tr>`;
+    });
+  } else {
+    eqRows=`<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--text3);font-size:12px;">No equipment matched in master. Check Equipment IDs in recipe.</td></tr>`;
+  }
+
+  document.getElementById('mapping-result').innerHTML=`
+    <!-- Summary bar -->
+    <div class="card" style="margin-bottom:12px;padding:12px 16px;">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Product</div><div style="font-weight:700;font-size:14px;color:var(--text);margin-top:2px;">${r.prod}</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Stage</div><div style="font-size:13px;color:var(--text2);margin-top:2px;">${r.stage}</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Input</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);margin-top:2px;">${r.inputQty||r.size||'—'} Kg</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Output</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--success);margin-top:2px;">${r.outputQty||'—'} Kg</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Target Batch</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--warn);margin-top:2px;">${batchSize} Kg</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Cycle Time</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);margin-top:2px;">${r.time||'—'}h</div></div>
+        <div><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Scale Factor</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);margin-top:2px;">${r.size?(batchSize/r.size).toFixed(2)+'×':'—'}</div></div>
+      </div>
+    </div>
+    <!-- Operations breakdown -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Operation-wise Equipment</div>
+    <div class="table-wrap" style="margin-bottom:12px;">
+      <table><thead><tr>
+        <th style="width:32px;text-align:center;">#</th><th>Operation</th><th>Equipment</th><th style="text-align:center;">Hrs</th>
+      </tr></thead><tbody>${opRows}</tbody></table>
+    </div>
+    <!-- Equipment master details -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Equipment Master Details</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Capacity</th><th>MOC</th><th>Location</th></tr></thead>
+      <tbody>${eqRows}</tbody></table>
+    </div>`;
+}
+
+// ══════════════════════════════════════
+// GANTT CHART
+// ══════════════════════════════════════
+function renderGantt(){
+  const sel=document.getElementById('gantt-batch-sel');
+  const container=document.getElementById('gantt-container');
+  if(!sel||!container) return;
+  const bIdx=parseInt(sel.value);
+  if(isNaN(bIdx)||bIdx<0){
+    container.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px;">Select a batch above to see the Gantt chart.</div>';
+    return;
+  }
+  const b=batchData[bIdx];
+  if(!b){container.innerHTML='';return;}
+
+  // find matching recipe
+  const recipe=recipeData.find(r=>r.prod===b.prod&&r.stage===b.stage);
+  if(!recipe||!recipe.steps||recipe.steps.length===0){
+    container.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:16px;">No recipe found for <strong>${b.prod} — ${b.stage}</strong>. Add recipe first to see Gantt.</div>`;
+    return;
+  }
+
+  const steps=recipe.steps;
+  const totalHrs=steps.reduce((sum,s)=>sum+(s.hrs||0),0)||1;
+  const startDate=b.date?new Date(b.date):new Date();
+
+  // determine which step is currently active based on progress
+  const progFraction=b.prog/100;
+  let cumulative=0;
+  let activeStepIdx=-1;
+  for(let i=0;i<steps.length;i++){
+    const frac=(steps[i].hrs||0)/totalHrs;
+    if(progFraction>=cumulative&&progFraction<cumulative+frac){activeStepIdx=i;break;}
+    cumulative+=frac;
+  }
+  if(b.prog>=100) activeStepIdx=-2; // all done
+
+  // build gantt rows
+  let cumHrs=0;
+  const rows=steps.map((s,i)=>{
+    const hrs=s.hrs||0;
+    const leftPct=(cumHrs/totalHrs)*100;
+    const widthPct=(hrs/totalHrs)*100;
+    let barClass='pending';
+    const stepFracEnd=(cumHrs+hrs)/totalHrs;
+    const stepFracStart=cumHrs/totalHrs;
+    if(b.prog/100>=stepFracEnd) barClass='done';
+    else if(i===activeStepIdx) barClass='active';
+
+    // calc step start datetime
+    const stepStart=new Date(startDate.getTime()+cumHrs*3600000);
+    const stepEnd=new Date(startDate.getTime()+(cumHrs+hrs)*3600000);
+    const fmt=d=>d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
+
+    const eqText=(s.equipIds||[]).map(id=>normalizeId(id)).join(', ');
+    const tooltip=`${s.desc}${eqText?' | '+eqText:''} | ${fmt(stepStart)} → ${fmt(stepEnd)}`;
+
+    cumHrs+=hrs;
+    return `<div style="display:flex;align-items:center;gap:0;margin-bottom:5px;">
+      <div class="gantt-label" title="${s.desc}">${i+1}. ${s.desc}</div>
+      <div class="gantt-track" style="flex:1;height:26px;background:var(--bg4);border-radius:4px;position:relative;overflow:hidden;">
+        <div class="gantt-bar ${barClass}"
+          style="left:${leftPct.toFixed(2)}%;width:${Math.max(widthPct,0.5).toFixed(2)}%;"
+          title="${tooltip}">
+          ${widthPct>8?hrs+'h':''}
+        </div>
+      </div>
+      <div class="gantt-hrs">${hrs}h</div>
+    </div>`;
+  }).join('');
+
+  // legend + summary
+  const doneHrs=steps.filter((_,i)=>{
+    let c=0;for(let j=0;j<i;j++) c+=steps[j].hrs||0;
+    return b.prog/100>=(c+(steps[i].hrs||0))/totalHrs;
+  }).reduce((s,st)=>s+(st.hrs||0),0);
+
+  container.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${b.prod} — ${b.stage}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Batch: ${b.no} &nbsp;·&nbsp; Start: ${b.date} &nbsp;·&nbsp; Total: ${totalHrs}h &nbsp;·&nbsp; Progress: <span style="color:var(--accent);font-weight:600;">${b.prog}%</span></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;border-radius:2px;background:var(--success);display:inline-block;"></span>Completed</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block;"></span>In Progress</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;border-radius:2px;background:var(--border2);display:inline-block;"></span>Pending</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+      <div style="width:150px;min-width:150px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;">Operation</div>
+      <div style="flex:1;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;padding-left:4px;">Timeline (proportional)</div>
+      <div style="width:32px;min-width:32px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);">Hrs</div>
+    </div>
+    ${rows}
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="font-size:11px;color:var(--text3);">Total Cycle: <span style="font-family:var(--mono);font-weight:600;color:var(--text);">${totalHrs}h</span></div>
+      <div style="font-size:11px;color:var(--text3);">Completed: <span style="font-family:var(--mono);font-weight:600;color:var(--success);">${doneHrs}h</span></div>
+      <div style="font-size:11px;color:var(--text3);">Remaining: <span style="font-family:var(--mono);font-weight:600;color:var(--warn);">${totalHrs-doneHrs}h</span></div>
+    </div>`;
+}
+function renderBatches(){
+  const tbody=document.getElementById('batch-tbody');
+  tbody.innerHTML='';
+  let active=0,comp=0,hold=0,alerts=0;
+  const ganttSel=document.getElementById('gantt-batch-sel');
+  if(ganttSel){
+    const prev=ganttSel.value;
+    ganttSel.innerHTML='<option value="">— Select Batch —</option>';
+    batchData.forEach((b,i)=>{
+      ganttSel.innerHTML+=`<option value="${i}">${b.no} — ${b.prod} (${b.stage})</option>`;
+    });
+    if(prev) ganttSel.value=prev;
+  }
+  batchData.forEach((b,i)=>{
+    if(b.status==='ip')active++;
+    if(b.status==='comp')comp++;
+    if(b.status==='hold')hold++;
+    alerts+=b.ipc.filter(c=>c.result==='fail').length;
+    const statusMap={ip:'<span class="badge ip">In Progress</span>',comp:'<span class="badge comp">Completed</span>',hold:'<span class="badge hold">On Hold</span>'};
+    tbody.innerHTML+=`<tr>
+      <td style="font-family:var(--mono);color:var(--accent2);font-weight:500;">${b.no}</td>
+      <td style="font-weight:500;">${b.prod}</td>
+      <td style="font-size:11px;color:var(--text3);">${b.stage}</td>
+      <td style="font-family:var(--mono);">${b.size} Kg</td>
+      <td style="font-family:var(--mono);font-size:11px;">${b.date}</td>
+      <td>${b.step}</td>
+      <td style="min-width:110px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-family:var(--mono);font-size:11px;min-width:32px;">${b.prog}%</span>
+          <div class="progress-wrap" style="flex:1;"><div class="progress-bar" style="width:${b.prog}%;background:${b.prog<50?'var(--danger)':b.prog<80?'var(--warn)':'var(--accent)'}"></div></div>
+        </div>
+      </td>
+      <td>${statusMap[b.status]||''}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="btn" onclick="showBatchDetail(${i})" style="padding:4px 8px;font-size:10px;">Detail/IPC</button>
+        <button class="btn danger" onclick="deleteBatch(${i})" style="padding:4px 8px;font-size:10px;">Del</button>
+      </td>
+    </tr>`;
+  });
+  document.getElementById('b-active').textContent=active;
+  document.getElementById('b-comp').textContent=comp;
+  document.getElementById('b-hold').textContent=hold;
+  document.getElementById('b-alerts').textContent=alerts;
+}
+function deleteBatch(i){if(confirm('Delete batch "'+batchData[i].no+'"?')){batchData.splice(i,1);renderBatches();document.getElementById('batch-detail-area').innerHTML='';}}
+function addBatch(){
+  const no=document.getElementById('nb-no').value.trim();
+  const prod=document.getElementById('nb-prod').value;
+  const stage=document.getElementById('nb-stage').value;
+  if(!no){alert('Batch No. required.');return;}
+  if(!prod){alert('Please select a Product.');return;}
+  if(!stage){alert('Please select a Stage.');return;}
+  if(batchData.find(b=>b.no===no)){alert('Batch No. "'+no+'" already exists.');return;}
+  // auto-load IPC checks from recipe
+  const recipe=recipeData.find(r=>r.prod===prod&&r.stage===stage);
+  const ipc=[];
+  if(recipe){
+    (recipe.steps||[]).forEach(s=>{
+      (s.ipcChecks||[]).forEach(ic=>{
+        ipc.push({
+          param:ic.param,
+          spec:ic.spec||'—',
+          operation:s.desc,
+          actual:'',
+          result:'pending',
+        });
+      });
+    });
+  }
+  batchData.unshift({
+    no,prod,stage,
+    size:parseFloat(document.getElementById('nb-size').value)||0,
+    date:document.getElementById('nb-date').value||new Date().toISOString().split('T')[0],
+    step:document.getElementById('nb-step').value||'—',
+    prog:0,
+    status:document.getElementById('nb-status').value,
+    ipc,
+  });
+  renderBatches();
+  closeModal('modal-add-batch');
+  ['nb-no','nb-size'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('nb-date').value='';
+  document.getElementById('nb-prod').innerHTML='<option value="">— Select Product —</option>';
+  document.getElementById('nb-stage').innerHTML='<option value="">— Select Stage —</option>';
+  document.getElementById('nb-step').innerHTML='<option value="">— Select Operation —</option>';
+  document.getElementById('nb-status').value='ip';
+}
+function showBatchDetail(i){
+  const b=batchData[i];
+  const ipcRows=b.ipc.map((c,ci)=>{
+    const isPending=!c.actual||c.result==='pending';
+    const resultBadge=c.result==='pass'
+      ?'<span class="ipc-tag ipc-pass">PASS</span>'
+      :c.result==='fail'
+      ?'<span class="ipc-tag ipc-fail">FAIL</span>'
+      :'<span style="font-size:11px;color:var(--text3);">Pending</span>';
+    if(isPending){
+      return `<tr>
+        <td style="font-size:11px;color:var(--text3);">${c.operation||'—'}</td>
+        <td style="font-weight:500;">${c.param}</td>
+        <td style="font-family:var(--mono);color:var(--accent);font-size:12px;">${c.spec}</td>
+        <td><input id="ipc-actual-${ci}" value="${c.actual||''}" placeholder="Enter value"
+          style="width:100%;padding:4px 6px;font-size:12px;border:1px solid var(--border2);border-radius:4px;font-family:var(--mono);"/></td>
+        <td>
+          <select id="ipc-result-${ci}" style="padding:4px 6px;font-size:12px;border:1px solid var(--border2);border-radius:4px;width:100%;">
+            <option value="pending" ${c.result==='pending'?'selected':''}>—</option>
+            <option value="pass" ${c.result==='pass'?'selected':''}>Pass</option>
+            <option value="fail" ${c.result==='fail'?'selected':''}>Fail</option>
+          </select>
+        </td>
+        <td><button class="btn primary" onclick="saveIpcRow(${i},${ci})" style="padding:3px 8px;font-size:10px;">Save</button></td>
+        <td><button class="btn danger" onclick="deleteIPC(${i},${ci})" style="padding:3px 7px;font-size:10px;">✕</button></td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td style="font-size:11px;color:var(--text3);">${c.operation||'—'}</td>
+        <td style="font-weight:500;">${c.param}</td>
+        <td style="font-family:var(--mono);color:var(--accent);font-size:12px;">${c.spec}</td>
+        <td style="font-family:var(--mono);font-size:12px;">${c.actual}</td>
+        <td>${resultBadge}</td>
+        <td><button class="btn" onclick="resetIpcRow(${i},${ci})" style="padding:3px 8px;font-size:10px;">Edit</button></td>
+        <td><button class="btn danger" onclick="deleteIPC(${i},${ci})" style="padding:3px 7px;font-size:10px;">✕</button></td>
+      </tr>`;
+    }
+  }).join('');
+
+  // count alerts
+  const failCount=b.ipc.filter(c=>c.result==='fail').length;
+  const pendingCount=b.ipc.filter(c=>!c.actual||c.result==='pending').length;
+
+  document.getElementById('batch-detail-area').innerHTML=`
+  <div class="card" style="margin-top:8px;border-color:var(--accentborder);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);">${b.no}</div>
+        <div style="font-size:15px;font-weight:600;margin-top:2px;">${b.prod} — ${b.stage}</div>
+      </div>
+      <button class="btn" onclick="document.getElementById('batch-detail-area').innerHTML=''" style="font-size:11px;">✕ Close</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-label">Batch Size</div><div style="font-family:var(--mono);font-size:15px;font-weight:600;">${b.size} Kg</div></div>
+      <div class="stat-card"><div class="stat-label">Start Date</div><div style="font-family:var(--mono);font-size:12px;font-weight:600;">${b.date}</div></div>
+      <div class="stat-card"><div class="stat-label">Current Op.</div><div style="font-size:12px;font-weight:500;">${b.step}</div></div>
+      ${failCount?`<div class="stat-card"><div class="stat-label">IPC Fails</div><div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--danger);">${failCount}</div></div>`:''}
+      ${pendingCount?`<div class="stat-card"><div class="stat-label">IPC Pending</div><div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--warn);">${pendingCount}</div></div>`:''}
+    </div>
+    <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">In-Process Checks (IPC)</div>
+    ${b.ipc.length
+      ?`<div class="table-wrap"><table>
+          <thead><tr><th>Operation</th><th>Parameter</th><th>Specification</th><th>Actual Value</th><th>Result</th><th></th><th></th></tr></thead>
+          <tbody>${ipcRows}</tbody>
+        </table></div>`
+      :'<div style="color:var(--text3);font-size:13px;padding:10px 0;">No IPC checks — add IPC checks to recipe operations first, or add manually below.</div>'}
+    <div style="margin-top:12px;"><button class="btn primary" onclick="addIPC(${i})">+ Add IPC Manually</button></div>
+  </div>`;
+}
+
+function saveIpcRow(bi,ci){
+  const actual=document.getElementById('ipc-actual-'+ci)?.value?.trim();
+  const result=document.getElementById('ipc-result-'+ci)?.value;
+  if(!actual){alert('Please enter actual value.');return;}
+  batchData[bi].ipc[ci].actual=actual;
+  batchData[bi].ipc[ci].result=result||'pending';
+  renderBatches();showBatchDetail(bi);
+}
+
+function resetIpcRow(bi,ci){
+  batchData[bi].ipc[ci].actual='';
+  batchData[bi].ipc[ci].result='pending';
+  showBatchDetail(bi);
+}
+function deleteIPC(bi,ci){batchData[bi].ipc.splice(ci,1);renderBatches();showBatchDetail(bi);}
+function addIPC(bi){
+  // show inline IPC form below the table
+  const existing=document.getElementById('ipc-inline-form');
+  if(existing) existing.remove();
+  const formHtml=`<div id="ipc-inline-form" style="margin-top:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.4px;">Add IPC Check</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div><label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;">Parameter</label>
+        <input id="ipc-param" placeholder="e.g. pH after addition" style="margin-top:4px;"/></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;">Specification</label>
+        <input id="ipc-spec" placeholder="e.g. 4.5 – 5.0" style="margin-top:4px;"/></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div><label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;">Actual Value</label>
+        <input id="ipc-actual" placeholder="e.g. 4.8" style="margin-top:4px;"/></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;">Result</label>
+        <select id="ipc-result" style="margin-top:4px;"><option value="pass">Pass</option><option value="fail">Fail</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn primary" onclick="saveIPC(${bi})" style="font-size:12px;">Save IPC</button>
+      <button class="btn" onclick="document.getElementById('ipc-inline-form').remove()" style="font-size:12px;">Cancel</button>
+    </div>
+  </div>`;
+  document.getElementById('batch-detail-area').querySelector('.card').insertAdjacentHTML('beforeend',formHtml);
+}
+function saveIPC(bi){
+  const param=document.getElementById('ipc-param')?.value?.trim();
+  const spec=document.getElementById('ipc-spec')?.value?.trim();
+  const actual=document.getElementById('ipc-actual')?.value?.trim();
+  const result=document.getElementById('ipc-result')?.value;
+  if(!param||!spec||!actual){alert('All fields required.');return;}
+  batchData[bi].ipc.push({param,spec,actual,result});
+  renderBatches();showBatchDetail(bi);
+}
+
+// ══════════════════════════════════════
+// TREND DATA — Product summary from recipe
+// ══════════════════════════════════════
+function renderTrendData(){
+  const filter=document.getElementById('trend-product-filter')?.value||'ALL';
+  const container=document.getElementById('trend-product-cards');
+  if(!container) return;
+
+  // populate filter dropdown
+  const sel=document.getElementById('trend-product-filter');
+  if(sel){
+    const prods=[...new Set(recipeData.map(r=>r.prod))];
+    const prev=sel.value;
+    sel.innerHTML='<option value="ALL">All Products</option>'+prods.map(p=>`<option value="${p}">${p}</option>`).join('');
+    if(prev) sel.value=prev;
+  }
+
+  const filtered=filter==='ALL'?recipeData:recipeData.filter(r=>r.prod===filter);
+  if(filtered.length===0){
+    container.innerHTML='<div style="padding:24px;color:var(--text3);font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;">No recipe data. Add recipes first.</div>';
+    return;
+  }
+
+  // Group by product
+  const grouped={};
+  filtered.forEach(r=>{if(!grouped[r.prod])grouped[r.prod]=[];grouped[r.prod].push(r);});
+
+  let html='';
+  Object.entries(grouped).forEach(([prod,stages])=>{
+    const stageCards=stages.map(r=>{
+      // operations as in-process reference
+      const opRows=(r.steps||[]).map((s,si)=>{
+        const eqBadges=(s.equipIds||[]).map(id=>
+          `<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);background:var(--accentbg);border:1px solid var(--accentborder);border-radius:3px;padding:1px 5px;">${normalizeId(id)}</span>`
+        ).join(' ');
+        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 6px;flex-shrink:0;">${si+1}</span>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:500;color:var(--text);">${s.desc}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;">${eqBadges}</div>
+          </div>
+          ${s.hrs?`<span style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--warn);flex-shrink:0;">${s.hrs}h</span>`:''}
+        </div>`;
+      }).join('');
+
+      // actual yield for this product+stage
+      const actuals=yieldData.filter(y=>y.prod===r.prod);
+      const avgYield=actuals.length?(actuals.reduce((s,y)=>s+y.yp,0)/actuals.length).toFixed(1):null;
+
+      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+        <!-- Stage header -->
+        <div style="padding:10px 12px;background:var(--accentbg);border-bottom:1px solid var(--accentborder);display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--accent);">${r.stage}</div>
+            ${r.prodCode?`<div style="font-size:10px;color:var(--text3);font-family:var(--mono);">${r.prodCode}</div>`:''}
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            ${r.inputQty?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Input</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);">${r.inputQty} Kg</div></div>`:''}
+            ${r.outputQty?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Output</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--success);">${r.outputQty} Kg</div></div>`:''}
+            ${r.time?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Cycle</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--warn);">${r.time}h</div></div>`:''}
+            ${r.yield?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Th. Yield</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);">${r.yield}%</div></div>`:''}
+            ${avgYield?`<div style="text-align:center;"><div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;">Avg Actual</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--success);">${avgYield}%</div></div>`:''}
+          </div>
+        </div>
+        <!-- Operations as in-process reference -->
+        <div style="padding:6px 12px 0;border-bottom:1px solid var(--border);background:var(--bg3);">
+          <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">In-Process Operations</span>
+        </div>
+        <div style="padding:0 12px 4px;background:var(--bg2);">${opRows||'<div style="padding:10px 0;font-size:12px;color:var(--text3);">No operations.</div>'}</div>
+      </div>`;
+    }).join('');
+
+    html+=`<div class="card" style="margin-bottom:14px;padding:12px 14px;">
+      <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:10px;">⬡ ${prod} <span style="font-size:11px;font-weight:400;color:var(--text3);">${stages.length} stage${stages.length>1?'s':''}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;">${stageCards}</div>
+    </div>`;
+  });
+  container.innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// YIELD
+// ══════════════════════════════════════
+function renderYieldTable(){
+  const tbody=document.getElementById('yield-tbody');
+  tbody.innerHTML='';
+  if(!yieldData.length){
+    document.getElementById('y-avg').textContent='—';
+    document.getElementById('y-best').textContent='—';
+    document.getElementById('y-low').textContent='—';
+    document.getElementById('y-total').textContent='0';
+    document.getElementById('yield-chart').innerHTML='';
+    return;
+  }
+  const vals=yieldData.map(y=>y.yp);
+  document.getElementById('y-avg').textContent=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)+'%';
+  document.getElementById('y-best').textContent=Math.max(...vals).toFixed(1)+'%';
+  document.getElementById('y-low').textContent=Math.min(...vals).toFixed(1)+'%';
+  document.getElementById('y-total').textContent=yieldData.length;
+  const prods=[...new Set(yieldData.map(y=>y.prod))];
+  const sel=document.getElementById('yield-product-filter');
+  sel.innerHTML='<option value="ALL">All Products</option>'+prods.map(p=>`<option>${p}</option>`).join('');
+  yieldData.forEach((y,i)=>{
+    tbody.innerHTML+=`<tr>
+      <td style="font-family:var(--mono);color:var(--accent2)">${y.no}</td>
+      <td>${y.prod}</td>
+      <td style="font-family:var(--mono);">${y.size} Kg</td>
+      <td style="font-family:var(--mono);">${y.theo} Kg</td>
+      <td style="font-family:var(--mono);">${y.actual} Kg</td>
+      <td style="font-family:var(--mono);font-weight:500;color:${y.yp>=85?'var(--success)':y.yp>=78?'var(--text)':'var(--danger)'}">${y.yp.toFixed(1)}%</td>
+      <td style="font-family:var(--mono);">${y.pur.toFixed(2)}%</td>
+      <td style="font-size:12px;color:var(--text2);">${y.app}</td>
+      <td><span class="badge ${y.result}">${y.result.toUpperCase()}</span></td>
+      <td><button class="btn danger" onclick="deleteYield(${i})" style="padding:4px 8px;font-size:10px;">Delete</button></td>
+    </tr>`;
+  });
+  renderYieldChart();
+}
+function deleteYield(i){if(confirm('Delete yield record?')){yieldData.splice(i,1);renderYieldTable();}}
+function calcYield(){
+  const theo=parseFloat(document.getElementById('ny-theo').value)||0;
+  const actual=parseFloat(document.getElementById('ny-actual').value)||0;
+  document.getElementById('ny-yp').value=theo>0?((actual/theo)*100).toFixed(2)+'%':'';
+}
+function addYieldResult(){
+  const no=document.getElementById('ny-no').value.trim();
+  const prod=document.getElementById('ny-prod').value.trim();
+  if(!no||!prod){alert('Batch No. and Product required.');return;}
+  if(yieldData.find(y=>y.no===no)){alert('Yield result for Batch "'+no+'" already exists.');return;}
+  const theo=parseFloat(document.getElementById('ny-theo').value)||0;
+  const actual=parseFloat(document.getElementById('ny-actual').value)||0;
+  const yp=theo>0?parseFloat(((actual/theo)*100).toFixed(2)):0;
+  yieldData.unshift({no,prod,
+    size:parseFloat(document.getElementById('ny-size').value)||0,
+    theo,actual,yp,
+    pur:parseFloat(document.getElementById('ny-pur').value)||0,
+    app:document.getElementById('ny-app').value||'—',
+    result:document.getElementById('ny-result').value,
+  });
+  renderYieldTable();closeModal('modal-add-yield');
+  ['ny-no','ny-prod','ny-size','ny-theo','ny-actual','ny-yp','ny-pur','ny-app'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+}
+function renderYieldChart(){
+  const filterEl=document.getElementById('yield-product-filter');
+  if(!filterEl) return;
+  const filter=filterEl.value||'ALL';
+  const data=filter==='ALL'?yieldData:yieldData.filter(y=>y.prod===filter);
+  const titleEl=document.getElementById('chart-title-label');
+  if(titleEl) titleEl.textContent='Yield % — '+(filter==='ALL'?'All Products':filter);
+  const chart=document.getElementById('yield-chart');
+  if(!chart) return;
+  chart.innerHTML='';
+  if(!data.length){
+    chart.innerHTML='<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center;width:100%;">No yield data logged yet.</div>';
+    return;
+  }
+  const maxY=Math.max(...data.map(d=>d.yp),100);
+  data.slice().reverse().forEach(d=>{
+    const h=Math.max((d.yp/maxY)*120,4);
+    const col=d.yp>=85?'var(--success)':d.yp>=78?'var(--accent)':'var(--danger)';
+    chart.innerHTML+=`<div class="bar-col">
+      <span class="bar-val">${d.yp.toFixed(1)}%</span>
+      <div class="bar" style="height:${h}px;background:${col};" title="${d.no}: ${d.yp}%"></div>
+      <span class="bar-label" title="${d.no}">${d.no}</span>
+    </div>`;
+  });
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderEquipment();
+renderRecipes();
+renderBatches();
+renderYieldTable();
+renderTrendData();
+</script>
+</body>
+</html>
