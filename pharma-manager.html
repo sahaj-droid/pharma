@@ -6,205 +6,828 @@
 <title>Pharma Manager — Production & Tech-Transfer</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f7fa;--bg2:#ffffff;--bg3:#f9fafb;--bg4:#eff2f5;
-  --border:#e5e7eb;--border2:#d1d5db;
-  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
-  --accent:#0066cc;--accent2:#0052a3;--accentbg:#eff6ff;--accentborder:#bfdbfe;
-  --success:#10b981;--successbg:#ecfdf5;--successborder:#86efac;
-  --warn:#f59e0b;--warnbg:#fffbeb;--warnborder:#fde68a;
-  --danger:#ef4444;--dangerbg:#fef2f2;--dangerborder:#fca5a5;
-  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
-  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:0 4px 12px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg:0 10px 30px rgba(0,0,0,0.15);
+/* Global Reset & Variables */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;line-height:1.6;}
-.app{display:flex;flex-direction:column;min-height:100vh;}
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:64px;
-  background:linear-gradient(135deg, var(--accent) 0%, #0052a3 100%);
-  box-shadow:0 4px 12px rgba(0,102,204,0.25);position:sticky;top:0;z-index:100;
+
+:root {
+  --bg: #f5f7fa;
+  --bg2: #ffffff;
+  --bg3: #f9fafb;
+  --bg4: #eff2f5;
+
+  --border: #e5e7eb;
+  --border2: #d1d5db;
+
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+
+  --accent: #0066cc;
+  --accent2: #0052a3;
+  --accentbg: #eff6ff;
+  --accentborder: #bfdbfe;
+
+  --success: #10b981;
+  --successbg: #ecfdf5;
+  --successborder: #86efac;
+
+  --warn: #f59e0b;
+  --warnbg: #fffbeb;
+  --warnborder: #fde68a;
+
+  --danger: #ef4444;
+  --dangerbg: #fef2f2;
+  --dangerborder: #fca5a5;
+
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
 }
-.topbar-brand{display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:16px;color:#fff;font-weight:700;letter-spacing:0.5px;}
-.topbar-brand span{color:rgba(255,255,255,0.8);font-weight:400;font-size:13px;}
-.topbar-status{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.85);font-family:var(--mono);}
-.dot{width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;box-shadow:0 0 8px #10b981;}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px #10b981;}50%{opacity:0.5;box-shadow:0 0 12px #10b981;}}
-.nav{display:none;}
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:200;
-  display:flex;align-items:stretch;
-  background:var(--bg2);border-top:2px solid var(--border);
-  box-shadow:0 -4px 16px rgba(0,0,0,0.12);
-  height:68px;
+
+/* Body Styles */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+  line-height: 1.6;
 }
-.bnav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;border:none;background:transparent;color:var(--text3);
-  font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.4px;
-  cursor:pointer;transition:all 0.2s ease;padding:8px 2px;
-  border-top:3px solid transparent;
+
+/* Application Layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-.bnav-btn:hover{color:var(--accent);background:var(--accentbg);transform:scale(1.05);}
-.bnav-btn.active{color:var(--accent);border-top-color:var(--accent);background:var(--accentbg);}
-.bnav-icon{font-size:22px;line-height:1;}
-.bnav-label{font-size:10px;font-weight:700;text-align:center;line-height:1.2;}
-.main{flex:1;padding:24px 20px 84px;max-width:1600px;width:100%;margin:0 auto;}
-@media(min-width:768px){
-  .main{padding:32px 36px 84px;}
-  .bnav-label{font-size:11px;}
-  .bnav-icon{font-size:24px;}
-  .bottom-nav{height:72px;}
+
+/* Top Bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  box-shadow: var(--shadow-md); /* Simplified shadow */
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.tab-bar{display:none!important;}
-.tab-content{display:none;}.tab-content.active{display:block;}
-.panel{display:none;}.panel.active{display:block;}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px;}
-.sec-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:0.3px;}
-.sec-sub{font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;}
-.btn{
-  padding:10px 18px;border-radius:8px;border:2px solid var(--border2);
-  background:var(--bg2);color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:600;
-  cursor:pointer;transition:all 0.2s ease;box-shadow:var(--shadow);
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--sans);
+  font-size: 16px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
-.btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accentbg);transform:translateY(-2px);box-shadow:var(--shadow-md);}
-.btn.primary{
-  background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  color:#fff;border-color:var(--accent);font-weight:700;box-shadow:0 4px 12px rgba(0,102,204,0.3);
+
+.topbar-brand .app-name {
+  font-weight: 700;
 }
-.btn.primary:hover{
-  box-shadow:0 6px 20px rgba(0,102,204,0.4);transform:translateY(-3px);
+
+.topbar-brand .app-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-size: 13px;
 }
-.btn.danger{border-color:#fca5a5;color:var(--danger);background:var(--bg2);}
-.btn.danger:hover{background:var(--dangerbg);transform:translateY(-2px);}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:var(--shadow);transition:all 0.3s ease;}
-.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
-.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
-.stat-card{
-  background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
-  border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow);
-  transition:all 0.3s ease;position:relative;overflow:hidden;
+
+.topbar-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--mono);
 }
-.stat-card::before{
-  content:'';position:absolute;top:0;right:0;width:60px;height:60px;
-  background:radial-gradient(circle, rgba(0,102,204,0.08) 0%, transparent 70%);
-  border-radius:50%;
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success);
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px var(--success);
 }
-.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
-.stat-label{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;}
-.stat-value{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--accent);letter-spacing:0.5px;}
-.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow);}
-table{width:100%;border-collapse:collapse;background:var(--bg2);}
-thead tr{background:linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);border-bottom:2px solid var(--border);}
-th{padding:16px 16px;text-align:left;font-size:12px;font-weight:700;letter-spacing:0.5px;color:var(--text2);text-transform:uppercase;white-space:nowrap;}
-td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);}
-tbody tr:last-child td{border-bottom:none;}
-tbody tr{transition:background 0.2s ease;}
-tbody tr:hover{background:var(--bg4);}
-.badge{display:inline-block;padding:5px 12px;border-radius:16px;font-size:12px;font-weight:700;letter-spacing:0.3px;}
-.badge.pass{background:var(--successbg);color:var(--success);border:1.5px solid var(--successborder);}
-.badge.fail{background:var(--dangerbg);color:var(--danger);border:1.5px solid var(--dangerborder);}
-.badge.ip{background:var(--accentbg);color:var(--accent);border:1.5px solid var(--accentborder);}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn 0.2s ease;}
-.modal-overlay.open{display:flex;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.modal{
-  background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:680px;max-width:96vw;
-  max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp 0.3s ease;
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--success); }
+  50% { opacity: 0.5; box-shadow: 0 0 12px var(--success); }
 }
-@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.modal-header{
-  display:flex;align-items:center;justify-content:space-between;padding:24px 28px;
-  border-bottom:1px solid var(--border);background:linear-gradient(90deg, var(--bg3) 0%, var(--accentbg) 100%);
-  border-radius:16px 16px 0 0;
+
+/* Navigation */
+.nav { display: none; } /* Hidden by default */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: stretch;
+  background: var(--bg2);
+  border-top: 2px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+  height: 68px;
 }
-.modal-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.3px;}
-.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px;transition:all 0.2s ease;}
-.modal-close:hover{color:var(--text);background:var(--bg4);transform:rotate(90deg);}
-.modal-body{padding:28px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-.form-group{display:flex;flex-direction:column;gap:8px;}
-.form-group.full{grid-column:1/-1;}
-label{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:0.4px;text-transform:uppercase;}
-input,select,textarea{
-  background:var(--bg2);border:2px solid var(--border2);border-radius:8px;color:var(--text);
-  font-family:var(--sans);font-size:13px;padding:10px 12px;outline:none;transition:all 0.2s ease;
-  font-weight:500;
+
+.bnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px 2px;
+  border-top: 3px solid transparent;
 }
-input:focus,select:focus,textarea:focus{
-  border-color:var(--accent);box-shadow:0 0 0 4px rgba(0,102,204,0.1);background:var(--bg2);
+
+.bnav-btn:hover {
+  color: var(--accent);
+  background: var(--accentbg);
+  transform: scale(1.05);
 }
-.modal-footer{display:flex;justify-content:flex-end;gap:12px;padding:20px 28px;border-top:1px solid var(--border);background:var(--bg3);border-radius:0 0 16px 16px;}
-.recipe-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;
-  box-shadow:var(--shadow);transition:all 0.3s ease;margin-bottom:20px;
+
+.bnav-btn.active {
+  color: var(--accent);
+  border-top-color: var(--accent);
+  background: var(--accentbg);
 }
-.recipe-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
-.recipe-card-header{
-  padding:16px 20px;border-bottom:1px solid var(--border);
-  background:linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
+
+.bnav-icon {
+  font-size: 22px;
+  line-height: 1;
 }
-.recipe-card-title{
-  display:flex;flex-direction:column;gap:4px;flex:1;
+
+.bnav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
 }
-.recipe-prod-name{font-size:15px;font-weight:700;color:var(--text);}
-.recipe-stage{font-size:12px;color:var(--text3);font-weight:600;}
-.recipe-card-meta{display:flex;gap:16px;font-size:12px;color:var(--text2);font-weight:600;}
-.recipe-card-body{padding:16px 20px;}
-.recipe-details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.recipe-detail-item{
-  display:flex;flex-direction:column;gap:4px;padding:8px;background:var(--bg3);border-radius:6px;
+
+/* Main Content Area */
+.main {
+  flex: 1;
+  padding: 24px 20px 84px; /* Add padding for bottom nav */
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
 }
-.recipe-detail-label{font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:700;letter-spacing:0.3px;}
-.recipe-detail-value{font-size:13px;color:var(--text);font-family:var(--mono);font-weight:600;}
-.recipe-steps-section{border-top:1px solid var(--border);padding-top:12px;margin-top:12px;}
-.recipe-step{
-  display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:start;margin-bottom:10px;
-  padding:10px;background:var(--bg4);border-radius:6px;
+
+@media (min-width: 768px) {
+  .main {
+    padding: 32px 36px 84px;
+  }
+  .bnav-label { font-size: 11px; }
+  .bnav-icon { font-size: 24px; }
+  .bottom-nav { height: 72px; }
 }
-.recipe-step-num{
-  font-size:12px;font-weight:700;color:var(--accent);background:var(--accentbg);
-  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+
+/* Tab Content & Panels */
+.tab-bar { display: none !important; } /* Hidden by default */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Section Headers */
+.sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
-.recipe-step-content{display:flex;flex-direction:column;gap:4px;flex:1;}
-.recipe-step-name{font-size:13px;font-weight:700;color:var(--text);}
-.recipe-step-info{font-size:12px;color:var(--text2);}
-.recipe-step-equip{
-  display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;
+
+.sec-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.3px;
 }
-.equip-badge{
-  display:inline-block;padding:3px 10px;background:var(--accentbg);
-  color:var(--accent);border:1px solid var(--accentborder);border-radius:12px;
-  font-size:11px;font-weight:600;
+
+.sec-sub {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-weight: 500;
 }
-.recipe-card-actions{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
-.recipe-card-actions .btn{flex:1;padding:8px 12px;font-size:12px;}
-.recipe-version-info{
-  display:flex;gap:8px;font-size:11px;color:var(--text3);font-weight:600;
-  align-items:center;
+
+/* Buttons */
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 2px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  text-decoration: none; /* For anchor tags if used as buttons */
+  display: inline-flex; /* For consistent alignment */
+  align-items: center;
+  justify-content: center;
 }
-.step-builder{border:1px solid var(--border);border-radius:8px;margin-bottom:16px;}
-.step-builder-header{
-  display:grid;grid-template-columns:40px 1fr 200px 100px;gap:12px;
-  padding:12px;background:linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);
-  border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accentbg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
-.step-builder-header span{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;}
-.step-builder-item{
-  display:grid;grid-template-columns:40px 1fr 200px 100px;gap:12px;
-  padding:12px;border-bottom:1px solid var(--border);align-items:end;
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
 }
-.step-builder-item input,.step-builder-item select{padding:8px 10px;font-size:12px;}
-.step-builder-item:last-child{border-bottom:none;}
-.step-remove-btn{padding:6px 10px;font-size:11px;width:100%;}
-.empty-state{
-  padding:40px 20px;text-align:center;color:var(--text3);
+
+.btn.primary:hover {
+  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+  transform: translateY(-3px);
 }
-.empty-state-icon{font-size:48px;margin-bottom:12px;}
-.empty-state-text{font-size:14px;font-weight:500;}
+
+.btn.danger {
+  border-color: var(--dangerborder);
+  color: var(--danger);
+  background: var(--bg2);
+}
+
+.btn.danger:hover {
+  background: var(--dangerbg);
+  transform: translateY(-2px);
+}
+
+/* Cards */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Stat Cards */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(0, 102, 204, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent); /* Default to accent */
+  letter-spacing: 0.5px;
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg2);
+}
+
+thead tr {
+  background: linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);
+  border-bottom: 2px solid var(--border);
+}
+
+th {
+  padding: 16px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr {
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: var(--bg4);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.badge.pass {
+  background: var(--successbg);
+  color: var(--success);
+  border: 1.5px solid var(--successborder);
+}
+
+.badge.fail {
+  background: var(--dangerbg);
+  color: var(--danger);
+  border: 1.5px solid var(--dangerborder);
+}
+
+.badge.ip { /* In Progress */
+  background: var(--accentbg);
+  color: var(--accent);
+  border: 1.5px solid var(--accentborder);
+}
+
+/* Modals */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 680px;
+  max-width: 96vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--bg3) 0%, var(--accentbg) 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.3px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background: var(--bg4);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 28px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+input, select, textarea {
+  background: var(--bg2);
+  border: 2px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+  background: var(--bg2);
+}
+
+/* Select multiple styling */
+select[multiple] {
+    min-height: 38px; /* Ensure it has a height */
+    padding: 8px 10px; /* Adjust padding for multi-select */
+    height: auto; /* Allow it to grow */
+}
+
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+  border-radius: 0 0 16px 16px;
+}
+
+/* Recipe Card */
+.recipe-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.recipe-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.recipe-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.recipe-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1; /* Take available space */
+}
+
+.recipe-prod-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.recipe-stage {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.recipe-card-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 600;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.recipe-card-body {
+  padding: 16px 20px;
+}
+
+.recipe-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive columns */
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.recipe-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg3);
+  border-radius: 6px;
+}
+
+.recipe-detail-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.recipe-detail-value {
+  font-size: 13px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.recipe-steps-section {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.recipe-step {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--bg4);
+  border-radius: 6px;
+}
+
+.recipe-step-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accentbg);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.recipe-step-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.recipe-step-info {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.recipe-step-equip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.equip-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--accentbg);
+  color: var(--accent);
+  border: 1px solid var(--accentborder);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.recipe-card-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.recipe-card-actions .btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* Recipe Version Info (Placeholder, not heavily used in current structure) */
+.recipe-version-info {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+  align-items: center;
+}
+
+/* Step Builder */
+.step-builder {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  background: var(--bg2); /* Added background for clarity */
+}
+
+.step-builder-header, .step-builder-item {
+  display: grid;
+  grid-template-columns: 40px 1fr 200px 100px; /* Fixed grid for columns */
+  gap: 12px;
+  padding: 12px;
+  align-items: center; /* Center align items in grid */
+}
+
+.step-builder-header {
+  background: linear-gradient(90deg, var(--bg3) 0%, var(--bg4) 100%);
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+}
+
+.step-builder-header span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.step-builder-item {
+  border-bottom: 1px solid var(--border);
+  align-items: stretch; /* Stretch items to fill height */
+}
+
+.step-builder-item:last-child {
+  border-bottom: none;
+}
+
+.step-builder-item input,
+.step-builder-item select {
+  padding: 8px 10px;
+  font-size: 12px;
+  height: 38px; /* Fixed height for consistency */
+}
+
+.step-builder-item select[multiple] {
+  height: auto; /* Allow multi-select to grow */
+  padding: 8px 10px;
+}
+
+
+.step-remove-btn {
+  padding: 6px 10px;
+  font-size: 11px;
+  width: 100%;
+  height: 38px; /* Match input height */
+  display: flex; /* Center button content */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text3);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state-text {
+  font-size: 14px;
+  font-weight: 500;
+}
 </style>
 </head>
 <body>
@@ -212,32 +835,50 @@ input:focus,select:focus,textarea:focus{
 
 <div class="topbar">
   <div class="topbar-brand">
-    ⬡ PHARMA MANAGER
-    <span>Production & Tech-Transfer</span>
+    <span class="app-name">PHARMA MANAGER</span>
+    <span class="app-description">Production & Tech-Transfer</span>
   </div>
   <div class="topbar-status">
-    <div class="dot"></div>
+    <div class="status-dot"></div>
     SYSTEM LIVE &nbsp;|&nbsp;
-    <span id="clock" style="color:#fff;font-family:var(--mono);"></span>
+    <span id="clock"></span>
   </div>
 </div>
 
-<div class="main">
+<main class="main">
 
 <div class="panel active" id="panel-equipment">
 
   <!-- Equipment List -->
   <div class="tab-content active" id="eq-tab-equip">
     <div class="stat-row">
-      <div class="stat-card"><div class="stat-label">Total Equipment</div><div class="stat-value" style="color:var(--accent)" id="eq-total">0</div></div>
-      <div class="stat-card"><div class="stat-label">Reactors (SSR/GLR/HSR)</div><div class="stat-value" id="eq-reactors">0</div></div>
-      <div class="stat-card"><div class="stat-label">ANFD / PNF / CF</div><div class="stat-value" id="eq-centrifuges">0</div></div>
-      <div class="stat-card"><div class="stat-label">VTD</div><div class="stat-value" id="eq-dryers">0</div></div>
-      <div class="stat-card"><div class="stat-label">Recipes Loaded</div><div class="stat-value" style="color:var(--success)" id="eq-recipes">0</div></div>
+      <div class="stat-card">
+        <div class="stat-label">Total Equipment</div>
+        <div class="stat-value" id="eq-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reactors (SSR/GLR/HSR)</div>
+        <div class="stat-value" id="eq-reactors">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ANFD / PNF / CF</div>
+        <div class="stat-value" id="eq-centrifuges">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">VTD</div>
+        <div class="stat-value" id="eq-dryers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Recipes Loaded</div>
+        <div class="stat-value" id="eq-recipes" style="color:var(--success);">0</div>
+      </div>
     </div>
     <div class="sec-head">
-      <div><div class="sec-title">Equipment Master</div><div class="sec-sub">Fixed reference data — grouped by location</div></div>
-      <button class="btn primary" onclick="resetEquipModal();openModal('modal-add-equip')">+ Add Equipment</button>
+      <div>
+        <div class="sec-title">Equipment Master</div>
+        <div class="sec-sub">Fixed reference data — grouped by location</div>
+      </div>
+      <button class="btn primary" id="add-equipment-btn">+ Add Equipment</button>
     </div>
     <div id="equip-grouped-view"></div>
   </div>
@@ -245,64 +886,106 @@ input:focus,select:focus,textarea:focus{
   <!-- Recipe Repository -->
   <div class="tab-content" id="eq-tab-recipe">
     <div class="sec-head">
-      <div><div class="sec-title">Recipe Repository</div><div class="sec-sub">Product-wise manufacturing recipes with equipment linkage</div></div>
-      <button class="btn primary" onclick="openRecipeModal()">+ Add New Recipe</button>
+      <div>
+        <div class="sec-title">Recipe Repository</div>
+        <div class="sec-sub">Product-wise manufacturing recipes with equipment linkage</div>
+      </div>
+      <button class="btn primary" id="add-recipe-btn">+ Add New Recipe</button>
     </div>
     <div id="recipe-list-container"></div>
   </div>
 
 </div><!-- end panel-equipment -->
 
-</div><!-- end .main -->
+</main><!-- end .main -->
 </div><!-- end .app -->
 
 <!-- BOTTOM NAVIGATION BAR -->
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="bnav-btn active" onclick="switchTab(this,'eq-tab-equip')" data-tab="eq-tab-equip">
-    <span class="bnav-icon">🔧</span>
+  <button class="bnav-btn active" data-tab="eq-tab-equip">
+    <span class="bnav-icon">&#128295;</span> <!-- Flask icon -->
     <span class="bnav-label">Equipment<br>Master</span>
   </button>
-  <button class="bnav-btn" onclick="switchTab(this,'eq-tab-recipe')" data-tab="eq-tab-recipe">
-    <span class="bnav-icon">📋</span>
+  <button class="bnav-btn" data-tab="eq-tab-recipe">
+    <span class="bnav-icon">&#128193;</span> <!-- Folder icon -->
     <span class="bnav-label">Product<br>Recipe</span>
   </button>
 </nav>
 
-<!-- ══════════════════════════════════════
-     MODALS
-══════════════════════════════════════ -->
+<!-- MODALS -->
 
 <!-- ADD EQUIPMENT MODAL -->
 <div class="modal-overlay" id="modal-add-equip">
   <div class="modal">
-    <div class="modal-header"><span class="modal-title" id="equip-modal-title">Add Equipment — Master Data</span><button class="modal-close" onclick="closeModal('modal-add-equip')">✕</button></div>
+    <div class="modal-header">
+      <span class="modal-title" id="equip-modal-title">Add Equipment — Master Data</span>
+      <button class="modal-close" data-close-modal="modal-add-equip">&#10005;</button> <!-- Cross icon -->
+    </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label>Equipment ID *</label><input id="ne-id" placeholder="e.g. R-101"/></div>
-        <div class="form-group"><label>Equipment Name *</label><input id="ne-name" placeholder="e.g. SS Reactor 1000L"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Type</label>
-          <select id="ne-type"><option>Reactor</option><option>Centrifuge</option><option>Dryer</option><option>Filter / Nutsche</option><option>Distillation Column</option><option>Storage Tank</option></select>
+        <div class="form-group">
+          <label for="ne-id">Equipment ID *</label>
+          <input id="ne-id" type="text" placeholder="e.g. R-101" required/>
         </div>
-        <div class="form-group"><label>Capacity</label><input id="ne-cap" placeholder="e.g. 1000 L"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>MOC</label><input id="ne-moc" placeholder="e.g. SS 316L"/></div>
-        <div class="form-group"><label>Jacket Type</label>
-          <select id="ne-jacket"><option>Hot Water</option><option>Steam</option><option>Chilled Water</option><option>Brine</option></select>
+        <div class="form-group">
+          <label for="ne-name">Equipment Name *</label>
+          <input id="ne-name" type="text" placeholder="e.g. SS Reactor 1000L" required/>
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Agitator Type</label>
-          <select id="ne-agit"><option>Anchor</option><option>Turbine</option><option>Paddle</option><option>Propeller</option><option>Gate</option><option>None</option></select>
+        <div class="form-group">
+          <label for="ne-type">Type</label>
+          <select id="ne-type">
+            <option value="Reactor">Reactor</option>
+            <option value="Centrifuge">Centrifuge</option>
+            <option value="Dryer">Dryer</option>
+            <option value="Filter / Nutsche">Filter / Nutsche</option>
+            <option value="Distillation Column">Distillation Column</option>
+            <option value="Storage Tank">Storage Tank</option>
+          </select>
         </div>
-        <div class="form-group"><label>Location / Block</label><input id="ne-loc" placeholder="e.g. Block-A, F-2"/></div>
+        <div class="form-group">
+          <label for="ne-cap">Capacity</label>
+          <input id="ne-cap" type="text" placeholder="e.g. 1000 L"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ne-moc">MOC</label>
+          <input id="ne-moc" type="text" placeholder="e.g. SS 316L"/>
+        </div>
+        <div class="form-group">
+          <label for="ne-jacket">Jacket Type</label>
+          <select id="ne-jacket">
+            <option value="Hot Water">Hot Water</option>
+            <option value="Steam">Steam</option>
+            <option value="Chilled Water">Chilled Water</option>
+            <option value="Brine">Brine</option>
+            <option value="N/A">N/A</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ne-agit">Agitator Type</label>
+          <select id="ne-agit">
+            <option value="Anchor">Anchor</option>
+            <option value="Turbine">Turbine</option>
+            <option value="Paddle">Paddle</option>
+            <option value="Propeller">Propeller</option>
+            <option value="Gate">Gate</option>
+            <option value="None">None</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ne-loc">Location / Block</label>
+          <input id="ne-loc" type="text" placeholder="e.g. Block-A, F-2"/>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-add-equip')">Cancel</button>
-      <button class="btn primary" id="equip-modal-save-btn" onclick="addEquipment()">Add Equipment</button>
+      <button class="btn" data-close-modal="modal-add-equip">Cancel</button>
+      <button class="btn primary" id="equip-modal-save-btn">Add Equipment</button>
     </div>
   </div>
 </div>
@@ -310,30 +993,57 @@ input:focus,select:focus,textarea:focus{
 <!-- ADD RECIPE MODAL -->
 <div class="modal-overlay" id="modal-add-recipe">
   <div class="modal" style="width:820px;">
-    <div class="modal-header"><span class="modal-title" id="recipe-modal-title">Add New Recipe</span><button class="modal-close" onclick="closeModal('modal-add-recipe')">✕</button></div>
+    <div class="modal-header">
+      <span class="modal-title" id="recipe-modal-title">Add New Recipe</span>
+      <button class="modal-close" data-close-modal="modal-add-recipe">&#10005;</button>
+    </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label>Product Name *</label><input id="nr-prod" placeholder="e.g. Metformin HCl"/></div>
-        <div class="form-group"><label>Stage *</label><input id="nr-stage" placeholder="e.g. API-Final"/></div>
+        <div class="form-group">
+          <label for="nr-prod">Product Name *</label>
+          <input id="nr-prod" type="text" placeholder="e.g. Metformin HCl" required/>
+        </div>
+        <div class="form-group">
+          <label for="nr-stage">Stage *</label>
+          <input id="nr-stage" type="text" placeholder="e.g. API-Final" required/>
+        </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Product Code</label><input id="nr-code" placeholder="e.g. 1010001323"/></div>
-        <div class="form-group"><label>Batch Size (Kg) *</label><input type="number" id="nr-size" placeholder="500"/></div>
+        <div class="form-group">
+          <label for="nr-code">Product Code</label>
+          <input id="nr-code" type="text" placeholder="e.g. 1010001323"/>
+        </div>
+        <div class="form-group">
+          <label for="nr-size">Batch Size (Kg) *</label>
+          <input id="nr-size" type="number" placeholder="500" required min="0"/>
+        </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Input Qty (Kg)</label><input type="number" id="nr-input" placeholder="e.g. 32"/></div>
-        <div class="form-group"><label>Expected Output (Kg) *</label><input type="number" id="nr-output" placeholder="e.g. 33.6"/></div>
+        <div class="form-group">
+          <label for="nr-input">Input Qty (Kg)</label>
+          <input id="nr-input" type="number" placeholder="e.g. 32" min="0"/>
+        </div>
+        <div class="form-group">
+          <label for="nr-output">Expected Output (Kg) *</label>
+          <input id="nr-output" type="number" placeholder="e.g. 33.6" required min="0"/>
+        </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Total Cycle Time (hrs) *</label><input type="number" id="nr-time" placeholder="140"/></div>
-        <div class="form-group"><label>Theoretical Yield (%) *</label><input type="number" id="nr-yield" placeholder="85" step="0.1"/></div>
+        <div class="form-group">
+          <label for="nr-time">Total Cycle Time (hrs) *</label>
+          <input id="nr-time" type="number" placeholder="140" required min="0"/>
+        </div>
+        <div class="form-group">
+          <label for="nr-yield">Theoretical Yield (%) *</label>
+          <input id="nr-yield" type="number" placeholder="85" step="0.1" required min="0" max="100"/>
+        </div>
       </div>
 
       <!-- STEP BUILDER -->
       <div class="form-group full" style="margin-top:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <label style="margin:0;">Operations & Equipment</label>
-          <button type="button" class="btn primary" onclick="addRecipeStep()" style="padding:8px 14px;font-size:12px;">+ Add Step</button>
+          <button type="button" class="btn primary" id="add-recipe-step-btn" style="padding:8px 14px;font-size:12px;">+ Add Step</button>
         </div>
         <div class="step-builder">
           <div class="step-builder-header">
@@ -343,381 +1053,600 @@ input:focus,select:focus,textarea:focus{
             <span>Duration (hrs)</span>
           </div>
           <div id="nr-steps-list"></div>
-          <div id="nr-steps-empty" style="padding:24px;text-align:center;font-size:13px;color:var(--text3);font-weight:500;">Click "+ Add Step" to add operations</div>
+          <div id="nr-steps-empty" class="empty-state" style="display: none;">Click "+ Add Step" to add operations</div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-add-recipe')">Cancel</button>
-      <button class="btn primary" id="recipe-modal-save-btn" onclick="addRecipe()">Save Recipe</button>
+      <button class="btn" data-close-modal="modal-add-recipe">Cancel</button>
+      <button class="btn primary" id="recipe-modal-save-btn">Save Recipe</button>
     </div>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════
-// INITIALIZATION & STORAGE
-// ══════════════════════════════════════
-function loadData(){
-  const saved=localStorage.getItem('pharmaData');
-  if(saved){
-    try{
-      const data=JSON.parse(saved);
-      equipmentData=data.equipmentData||equipmentData;
-      recipeData=data.recipeData||recipeData;
-    }catch(e){console.error('Load error:',e);}
+// --- Application State ---
+const appState = {
+  equipmentData: [],
+  recipeData: [],
+  editingRecipeIndex: -1 // Tracks the index of the recipe being edited
+};
+
+// --- Local Storage Management ---
+function loadData() {
+  const savedData = localStorage.getItem('pharmaManagerData');
+  if (savedData) {
+    try {
+      const data = JSON.parse(savedData);
+      appState.equipmentData = data.equipmentData || appState.equipmentData;
+      appState.recipeData = data.recipeData || appState.recipeData;
+      console.log("Data loaded successfully.");
+    } catch (e) {
+      console.error('Error loading data from localStorage:', e);
+      // Optionally, reset to defaults or show an error to the user
+      alert('Error loading application data. Please clear your browser cache or storage.');
+    }
+  } else {
+    console.log("No saved data found, starting with defaults.");
+    // Populate with default data if none exists
+    appState.equipmentData = [
+      { id: 'R-101', name: 'Stainless Steel Reactor 2000L', type: 'Reactor', cap: '2000 L', moc: 'SS 316', jacket: 'Steam', agit: 'Anchor+Propeller', loc: 'Block-A' },
+      { id: 'R-102', name: 'Glass Lined Reactor 2500L', type: 'Reactor', cap: '2500 L', moc: 'MSGL', jacket: 'Hot Water', agit: 'Anchor', loc: 'Block-A' },
+      { id: 'R-103', name: 'Stainless Steel Reactor 3000L', type: 'Reactor', cap: '3000 L', moc: 'SS 316', jacket: 'Steam', agit: 'Anchor+Propeller', loc: 'Block-B' },
+      { id: 'ANFD-01', name: 'Agitated Nutsche Filter Dryer 500L', type: 'ANFD', cap: '500 L', moc: 'SS 316', jacket: '—', agit: 'S-Type Blade', loc: 'Block-B' },
+      { id: 'PNF-01', name: 'Pressure Nutsche Filter Dryer 500L', type: 'PNF', cap: '500 L', moc: 'SS 316', jacket: '—', agit: '—', loc: 'Block-C' },
+      { id: 'VTD-01', name: 'Vacuum Tray Dryer 24 Trays', type: 'VTD', cap: '24 Trays', moc: 'SS 316', jacket: 'Steam', agit: '—', loc: 'Block-C' },
+    ];
+    // No default recipes
   }
 }
 
-function saveData(){
-  const data={equipmentData,recipeData};
-  localStorage.setItem('pharmaData',JSON.stringify(data));
+function saveData() {
+  const dataToSave = {
+    equipmentData: appState.equipmentData,
+    recipeData: appState.recipeData
+  };
+  try {
+    localStorage.setItem('pharmaManagerData', JSON.stringify(dataToSave));
+    console.log("Data saved successfully.");
+  } catch (e) {
+    console.error('Error saving data to localStorage:', e);
+    alert('Error saving application data. Your changes might not be preserved.');
+  }
 }
 
-// ══════════════════════════════════════
-// CLOCK
-// ══════════════════════════════════════
-function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});}
-setInterval(updateClock,1000);updateClock();
+// --- Clock Update ---
+function updateClock() {
+  const clockElement = document.getElementById('clock');
+  if (clockElement) {
+    clockElement.textContent = new Date().toLocaleTimeString('en-IN', { hour12: false });
+  }
+}
 
-// ══════════════════════════════════════
-// NAV & TABS
-// ══════════════════════════════════════
-function switchTab(btn,tabId){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+// --- Modal Management ---
+function openModal(modalId) {
+  const modalOverlay = document.getElementById(modalId);
+  if (modalOverlay) {
+    modalOverlay.classList.add('open');
+    // Basic accessibility: focus on the modal
+    modalOverlay.focus();
+  }
+}
+
+function closeModal(modalId) {
+  const modalOverlay = document.getElementById(modalId);
+  if (modalOverlay) {
+    modalOverlay.classList.remove('open');
+    // Reset form/state if needed
+    if (modalId === 'modal-add-equip') {
+      resetEquipmentForm();
+    } else if (modalId === 'modal-add-recipe') {
+      resetRecipeForm();
+    }
+  }
+}
+
+// Close modal when clicking outside of it (on the overlay)
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeModal(this.id);
+    }
+  });
+});
+
+// Close modal when clicking close buttons within the modal
+document.querySelectorAll('[data-close-modal]').forEach(button => {
+  button.addEventListener('click', function() {
+    const modalId = this.getAttribute('data-close-modal');
+    closeModal(modalId);
+  });
+});
+
+// --- Navigation & Tab Switching ---
+function switchTab(button, tabId) {
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
-  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
-  const match=document.querySelector(`.bnav-btn[data-tab="${tabId}"]`);
-  if(match) match.classList.add('active');
-  if(tabId==='eq-tab-recipe') renderRecipes();
-  window.scrollTo({top:0,behavior:'smooth'});
+
+  document.querySelectorAll('.bnav-btn').forEach(btn => btn.classList.remove('active'));
+  button.classList.add('active');
+
+  // Render specific content when tabs are switched
+  if (tabId === 'eq-tab-recipe') {
+    renderRecipes();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ══════════════════════════════════════
-// MODAL
-// ══════════════════════════════════════
-function openModal(id){
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
-
-// ══════════════════════════════════════
-// DATA
-// ══════════════════════════════════════
-let equipmentData=[
-  {id:'R-101',name:'Stainless Steel Reactor 2000L',type:'Reactor',cap:'2000 L',moc:'SS 316',jacket:'Steam',agit:'Anchor+Propeller',loc:'Block-A'},
-  {id:'R-102',name:'Glass Lined Reactor 2500L',type:'Reactor',cap:'2500 L',moc:'MSGL',jacket:'Hot Water',agit:'Anchor',loc:'Block-A'},
-  {id:'R-103',name:'Stainless Steel Reactor 3000L',type:'Reactor',cap:'3000 L',moc:'SS 316',jacket:'Steam',agit:'Anchor+Propeller',loc:'Block-B'},
-  {id:'ANFD-01',name:'Agitated Nutsche Filter Dryer 500L',type:'ANFD',cap:'500 L',moc:'SS 316',jacket:'—',agit:'S-Type Blade',loc:'Block-B'},
-  {id:'PNF-01',name:'Pressure Nutsche Filter Dryer 500L',type:'PNF',cap:'500 L',moc:'SS 316',jacket:'—',agit:'—',loc:'Block-C'},
-  {id:'VTD-01',name:'Vacuum Tray Dryer 24 Trays',type:'VTD',cap:'24 Trays',moc:'SS 316',jacket:'Steam',agit:'—',loc:'Block-C'},
-];
-
-let recipeData=[];
-let recipeStepTemp=[];
-
-// ══════════════════════════════════════
-// EQUIPMENT FUNCTIONS
-// ══════════════════════════════════════
-function renderEquipment(){
-  const grouped={};
-  equipmentData.forEach((e,idx)=>{
-    const loc=e.loc||'Other';
-    if(!grouped[loc]) grouped[loc]=[];
-    grouped[loc].push({...e,_idx:idx});
+// --- Equipment Management ---
+function renderEquipment() {
+  const groupedEquipment = {};
+  appState.equipmentData.forEach(eq => {
+    const location = eq.loc || 'Other';
+    if (!groupedEquipment[location]) {
+      groupedEquipment[location] = [];
+    }
+    groupedEquipment[location].push(eq);
   });
 
-  const container=document.getElementById('equip-grouped-view');
-  let html='';
-  
-  Object.keys(grouped).forEach(loc=>{
-    const items=grouped[loc];
-    const cards=items.map(e=>`
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <div><strong style="color:var(--accent);">${e.id}</strong></div>
-          <span style="font-size:11px;background:var(--accentbg);color:var(--accent);padding:3px 8px;border-radius:4px;font-weight:600;">${e.type}</span>
+  const container = document.getElementById('equip-grouped-view');
+  let html = '';
+
+  Object.keys(groupedEquipment).sort().forEach(location => {
+    const items = groupedEquipment[location];
+    const cardsHtml = items.map(eq => `
+      <div class="card" style="margin-bottom: 12px;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div style="font-size: 13px; font-weight: 600;">
+            <strong class="text-accent">${eq.id}</strong>
+          </div>
+          <span class="badge ip">${eq.type}</span>
         </div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">${e.name}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
-          <div>Capacity: <strong>${e.cap}</strong></div>
-          <div>MOC: <strong>${e.moc}</strong></div>
-          <div>Agitator: <strong>${e.agit}</strong></div>
-          <div>Jacket: <strong>${e.jacket}</strong></div>
+        <div class="mb-2">${eq.name}</div>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <div>Capacity: <strong>${eq.cap}</strong></div>
+          <div>MOC: <strong>${eq.moc}</strong></div>
+          <div>Agitator: <strong>${eq.agit}</strong></div>
+          <div>Jacket: <strong>${eq.jacket}</strong></div>
         </div>
       </div>
     `).join('');
-    
-    html+=`<div style="margin-bottom:24px;"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">${loc} (${items.length})</div><div>${cards}</div></div>`;
+
+    html += `
+      <div class="mb-6">
+        <div class="text-lg font-bold mb-3">${location} (${items.length})</div>
+        <div>${cardsHtml}</div>
+      </div>
+    `;
   });
 
-  container.innerHTML=html;
-  
-  document.getElementById('eq-total').textContent=equipmentData.length;
-  document.getElementById('eq-reactors').textContent=equipmentData.filter(e=>e.type==='Reactor').length;
-  document.getElementById('eq-centrifuges').textContent=equipmentData.filter(e=>['ANFD','PNF'].includes(e.type)).length;
-  document.getElementById('eq-dryers').textContent=equipmentData.filter(e=>e.type==='VTD').length;
-  document.getElementById('eq-recipes').textContent=recipeData.length;
+  container.innerHTML = html;
+
+  // Update stats
+  document.getElementById('eq-total').textContent = appState.equipmentData.length;
+  document.getElementById('eq-reactors').textContent = appState.equipmentData.filter(e => e.type === 'Reactor').length;
+  document.getElementById('eq-centrifuges').textContent = appState.equipmentData.filter(e => ['ANFD', 'PNF', 'CF'].includes(e.type)).length;
+  document.getElementById('eq-dryers').textContent = appState.equipmentData.filter(e => e.type === 'VTD').length;
+  document.getElementById('eq-recipes').textContent = appState.recipeData.length;
 }
 
-function addEquipment(){
-  const id=document.getElementById('ne-id').value.trim();
-  const name=document.getElementById('ne-name').value.trim();
-  if(!id||!name){alert('Equipment ID અને Name જરૂરી છે');return;}
-  
-  if(equipmentData.find(e=>e.id===id)){alert('Equipment ID પહેલાથી છે');return;}
-  
-  equipmentData.push({
-    id,name,
-    type:document.getElementById('ne-type').value,
-    cap:document.getElementById('ne-cap').value,
-    moc:document.getElementById('ne-moc').value,
-    jacket:document.getElementById('ne-jacket').value,
-    agit:document.getElementById('ne-agit').value,
-    loc:document.getElementById('ne-loc').value||'Other',
+function resetEquipmentForm() {
+  document.getElementById('equip-modal-title').textContent = 'Add Equipment — Master Data';
+  document.getElementById('equip-modal-save-btn').textContent = 'Add Equipment';
+  document.getElementById('equip-modal-save-btn').onclick = addEquipment; // Reset handler
+  ['ne-id', 'ne-name', 'ne-cap', 'ne-moc', 'ne-loc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = '';
+      el.classList.remove('input-error'); // Remove error styling if any
+    }
   });
-  
+  // Reset select to default
+  document.getElementById('ne-type').value = 'Reactor';
+  document.getElementById('ne-jacket').value = 'Hot Water';
+  document.getElementById('ne-agit').value = 'Anchor';
+}
+
+function validateEquipmentForm() {
+  const idInput = document.getElementById('ne-id');
+  const nameInput = document.getElementById('ne-name');
+  const requiredFields = [idInput, nameInput];
+  let isValid = true;
+
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      field.classList.add('input-error');
+      isValid = false;
+    } else {
+      field.classList.remove('input-error');
+    }
+  });
+
+  // Check for duplicate equipment ID
+  const equipmentId = idInput.value.trim();
+  if (appState.equipmentData.some(eq => eq.id === equipmentId && appState.editingRecipeIndex === -1)) {
+    alert('Equipment ID already exists. Please use a unique ID.');
+    idInput.classList.add('input-error');
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+function addEquipment() {
+  if (!validateEquipmentForm()) return;
+
+  const newEquipment = {
+    id: document.getElementById('ne-id').value.trim(),
+    name: document.getElementById('ne-name').value.trim(),
+    type: document.getElementById('ne-type').value,
+    cap: document.getElementById('ne-cap').value.trim(),
+    moc: document.getElementById('ne-moc').value.trim(),
+    jacket: document.getElementById('ne-jacket').value,
+    agit: document.getElementById('ne-agit').value,
+    loc: document.getElementById('ne-loc').value.trim() || 'Other',
+  };
+
+  appState.equipmentData.push(newEquipment);
   renderEquipment();
   closeModal('modal-add-equip');
   saveData();
 }
 
-function resetEquipModal(){
-  ['ne-id','ne-name','ne-cap','ne-moc','ne-loc'].forEach(f=>{
-    const el=document.getElementById(f);if(el)el.value='';
-  });
-}
+// --- Recipe Management ---
+function renderRecipes() {
+  const container = document.getElementById('recipe-list-container');
 
-// ══════════════════════════════════════
-// RECIPE FUNCTIONS
-// ══════════════════════════════════════
-function renderRecipes(){
-  const container=document.getElementById('recipe-list-container');
-  
-  if(recipeData.length===0){
-    container.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">કોઈ recipes નથી. "+ Add New Recipe" બટન પર ક્લિક કરો</div></div>';
+  if (appState.recipeData.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">&#128193;</div> <!-- Folder icon -->
+        <div class="empty-state-text">No recipes yet. Click "+ Add New Recipe" to get started.</div>
+      </div>
+    `;
     return;
   }
 
-  let html=recipeData.map((r,idx)=>{
-    const stepsHtml=r.steps.map((s,sidx)=>`
-      <div class="recipe-step">
-        <div class="recipe-step-num">${sidx+1}</div>
-        <div class="recipe-step-content">
-          <div class="recipe-step-name">${s.name}</div>
-          <div class="recipe-step-info">${s.hrs} hrs | Volume: ${s.minVol}-${s.maxVol}L</div>
-          <div class="recipe-step-equip">
-            ${s.equipIds.map(eid=>`<span class="equip-badge">${eid}</span>`).join('')}
-          </div>
+  const html = appState.recipeData.map((recipe, idx) => `
+    <div class="recipe-card">
+      <div class="recipe-card-header">
+        <div class="recipe-card-title">
+          <div class="recipe-prod-name">${recipe.product}</div>
+          <div class="recipe-stage">${recipe.stage}</div>
+        </div>
+        <div class="recipe-card-meta">
+          <div>&#128204; ${recipe.batchSize} Kg</div> <!-- Package icon -->
+          <div>&#128336; ${recipe.cycleTime} hrs</div> <!-- Clock icon -->
+          <div>&#127881; ${recipe.yield}%</div> <!-- Trophy icon -->
         </div>
       </div>
-    `).join('');
-
-    return `
-      <div class="recipe-card">
-        <div class="recipe-card-header">
-          <div class="recipe-card-title">
-            <div class="recipe-prod-name">${r.product}</div>
-            <div class="recipe-stage">${r.stage}</div>
+      <div class="recipe-card-body">
+        <div class="recipe-details">
+          <div class="recipe-detail-item">
+            <div class="recipe-detail-label">Product Code</div>
+            <div class="recipe-detail-value">${recipe.code || '—'}</div>
           </div>
-          <div class="recipe-card-meta">
-            <div>📦 ${r.batchSize} Kg</div>
-            <div>⏱️ ${r.cycleTime} hrs</div>
-            <div>📈 ${r.yield}%</div>
+          <div class="recipe-detail-item">
+            <div class="recipe-detail-label">Input Qty</div>
+            <div class="recipe-detail-value">${recipe.inputQty} Kg</div>
+          </div>
+          <div class="recipe-detail-item">
+            <div class="recipe-detail-label">Output Qty</div>
+            <div class="recipe-detail-value">${recipe.outputQty} Kg</div>
+          </div>
+          <div class="recipe-detail-item">
+            <div class="recipe-detail-label">Operations</div>
+            <div class="recipe-detail-value">${recipe.steps.length} Steps</div>
           </div>
         </div>
-        <div class="recipe-card-body">
-          <div class="recipe-details">
-            <div class="recipe-detail-item">
-              <div class="recipe-detail-label">Product Code</div>
-              <div class="recipe-detail-value">${r.code||'—'}</div>
+        <div class="recipe-steps-section">
+          <div class="text-sm font-bold uppercase tracking-wider mb-2">Operations Timeline</div>
+          ${recipe.steps.map((step, stepIdx) => `
+            <div class="recipe-step">
+              <div class="recipe-step-num">${stepIdx + 1}</div>
+              <div class="recipe-step-content">
+                <div class="recipe-step-name">${step.name}</div>
+                <div class="recipe-step-info">Duration: ${step.duration} hrs</div>
+                <div class="recipe-step-equip">
+                  ${step.equipmentIds.map(eid => `<span class="equip-badge">${eid}</span>`).join('')}
+                </div>
+              </div>
             </div>
-            <div class="recipe-detail-item">
-              <div class="recipe-detail-label">Input Qty</div>
-              <div class="recipe-detail-value">${r.inputQty} Kg</div>
-            </div>
-            <div class="recipe-detail-item">
-              <div class="recipe-detail-label">Output Qty</div>
-              <div class="recipe-detail-value">${r.outputQty} Kg</div>
-            </div>
-            <div class="recipe-detail-item">
-              <div class="recipe-detail-label">Operations</div>
-              <div class="recipe-detail-value">${r.steps.length} Steps</div>
-            </div>
-          </div>
-          <div class="recipe-steps-section">
-            <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Operations Timeline</div>
-            ${stepsHtml}
-          </div>
-          <div class="recipe-card-actions">
-            <button class="btn" onclick="editRecipe(${idx})" style="flex:1;">✎ Edit</button>
-            <button class="btn danger" onclick="deleteRecipe(${idx})" style="flex:1;">Delete</button>
-          </div>
+          `).join('')}
+        </div>
+        <div class="recipe-card-actions">
+          <button class="btn edit-recipe-btn" data-index="${idx}">&#9998; Edit</button> <!-- Pencil icon -->
+          <button class="btn danger delete-recipe-btn" data-index="${idx}">Delete</button>
         </div>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 
-  container.innerHTML=html;
+  container.innerHTML = html;
+  attachRecipeActionListeners();
 }
 
-function openRecipeModal(){
-  document.getElementById('recipe-modal-title').textContent='Add New Recipe';
-  document.getElementById('recipe-modal-save-btn').textContent='Save Recipe';
-  resetRecipeModal();
-  openModal('modal-add-recipe');
-}
+function resetRecipeForm() {
+  appState.editingRecipeIndex = -1; // Reset editing index
+  document.getElementById('recipe-modal-title').textContent = 'Add New Recipe';
+  document.getElementById('recipe-modal-save-btn').textContent = 'Save Recipe';
+  document.getElementById('recipe-modal-save-btn').onclick = addRecipe; // Reset handler
 
-function resetRecipeModal(){
-  ['nr-prod','nr-stage','nr-code','nr-size','nr-input','nr-output','nr-time','nr-yield'].forEach(f=>{
-    const el=document.getElementById(f);if(el)el.value='';
+  ['nr-prod', 'nr-stage', 'nr-code', 'nr-size', 'nr-input', 'nr-output', 'nr-time', 'nr-yield'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = '';
+      el.classList.remove('input-error'); // Remove error styling
+    }
   });
-  recipeStepTemp=[];
-  document.getElementById('nr-steps-list').innerHTML='';
-  document.getElementById('nr-steps-empty').style.display='block';
+
+  // Clear and reset step builder
+  document.getElementById('nr-steps-list').innerHTML = '';
+  document.getElementById('nr-steps-empty').style.display = 'block'; // Show empty state
+  // We'll repopulate equipment options when opening/editing
 }
 
-let recipeEditIdx=-1;
+function populateEquipmentOptions(selectElement) {
+  selectElement.innerHTML = ''; // Clear existing options
+  appState.equipmentData.forEach(eq => {
+    const option = document.createElement('option');
+    option.value = eq.id;
+    option.textContent = `${eq.id} (${eq.type})`;
+    selectElement.appendChild(option);
+  });
+}
 
-function addRecipeStep(){
-  const stepNum=recipeStepTemp.length+1;
-  const stepId='step-'+stepNum;
-  
-  recipeStepTemp.push({name:'',hrs:'',minVol:'',maxVol:'',equipIds:[]});
-  
-  const stepHtml=`
-    <div class="step-builder-item" id="${stepId}">
-      <input type="number" value="${stepNum}" readonly style="background:var(--bg4);cursor:not-allowed;"/>
-      <input type="text" placeholder="e.g. Reaction Monitoring" id="sn-${stepNum}"/>
-      <select id="se-${stepNum}" multiple style="min-height:38px;">
-        ${equipmentData.map(e=>`<option value="${e.id}">${e.id} (${e.type})</option>`).join('')}
+function addRecipeStep() {
+  const listContainer = document.getElementById('nr-steps-list');
+  const emptyState = document.getElementById('nr-steps-empty');
+
+  if (emptyState) emptyState.style.display = 'none'; // Hide empty state
+
+  const stepIndex = listContainer.children.length; // 0-based index for internal tracking
+
+  const stepHtml = `
+    <div class="step-builder-item" data-step-index="${stepIndex}">
+      <input type="number" value="${stepIndex + 1}" readonly class="bg-gray-100 cursor-not-allowed"/>
+      <input type="text" placeholder="Operation Name" class="step-name-input" required/>
+      <select multiple class="step-equipment-select">
+        <!-- Options will be populated dynamically -->
       </select>
-      <button class="btn danger step-remove-btn" onclick="removeRecipeStep('${stepId}',${stepNum})">Remove</button>
+      <input type="number" placeholder="Duration (hrs)" class="step-duration-input" required min="0"/>
+      <button type="button" class="btn danger step-remove-btn">Remove</button>
     </div>
   `;
-  
-  const list=document.getElementById('nr-steps-list');
-  list.insertAdjacentHTML('beforeend',stepHtml);
-  document.getElementById('nr-steps-empty').style.display='none';
+  listContainer.insertAdjacentHTML('beforeend', stepHtml);
+
+  // Populate the select with current equipment
+  const newSelect = listContainer.lastElementChild.querySelector('.step-equipment-select');
+  populateEquipmentOptions(newSelect);
+
+  // Attach event listener for the remove button
+  listContainer.lastElementChild.querySelector('.step-remove-btn').addEventListener('click', function() {
+    removeRecipeStep(this.closest('.step-builder-item'));
+  });
 }
 
-function removeRecipeStep(stepId,idx){
-  document.getElementById(stepId).remove();
-  recipeStepTemp.splice(idx-1,1);
-  if(recipeStepTemp.length===0) document.getElementById('nr-steps-empty').style.display='block';
+function removeRecipeStep(stepItemElement) {
+  stepItemElement.remove();
+  // If no steps left, show empty state
+  if (document.getElementById('nr-steps-list').children.length === 0) {
+    document.getElementById('nr-steps-empty').style.display = 'block';
+  }
 }
 
-function addRecipe(){
-  const prod=document.getElementById('nr-prod').value.trim();
-  const stage=document.getElementById('nr-stage').value.trim();
-  const size=parseFloat(document.getElementById('nr-size').value);
-  const output=parseFloat(document.getElementById('nr-output').value);
-  const time=parseFloat(document.getElementById('nr-time').value);
-  const yield_val=parseFloat(document.getElementById('nr-yield').value);
+function validateRecipeForm() {
+  const requiredFields = [
+    'nr-prod', 'nr-stage', 'nr-size', 'nr-output', 'nr-time', 'nr-yield'
+  ];
+  let isValid = true;
 
-  if(!prod||!stage||!size||!output||!time||!yield_val){alert('બધા જરૂરી ફીલ્ડ ભરો');return;}
-  if(recipeStepTemp.length===0){alert('ઓછામાં ઓછો એક operation ઉમેરો');return;}
+  requiredFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.classList.add('input-error');
+      isValid = false;
+    } else {
+      el.classList.remove('input-error');
+    }
+  });
 
-  const steps=[];
-  for(let i=0;i<recipeStepTemp.length;i++){
-    const name=document.getElementById(`sn-${i+1}`).value.trim();
-    const hrs=parseFloat(document.getElementById(`se-${i+1}`)?.parentElement.nextElementSibling?.querySelector('input')?.value||0);
-    const sel=document.getElementById(`se-${i+1}`);
-    const equipIds=Array.from(sel.selectedOptions).map(o=>o.value);
-    
-    if(!name){alert(`Step ${i+1} નું નામ ભરો`);return;}
-    if(equipIds.length===0){alert(`Step ${i+1} માટે equipment પસંદ કરો`);return;}
-    
-    steps.push({
-      name,
-      hrs:parseFloat(document.querySelector(`#step-${i+1} input[type="number"]:last-child`)?.value||1),
-      minVol:500,maxVol:600,
-      equipIds
+  // Validate steps
+  const stepsList = document.getElementById('nr-steps-list');
+  const stepItems = stepsList.querySelectorAll('.step-builder-item');
+
+  if (stepItems.length === 0) {
+    alert('Please add at least one operation step.');
+    isValid = false;
+  } else {
+    stepItems.forEach((item, index) => {
+      const stepNum = index + 1;
+      const nameInput = item.querySelector('.step-name-input');
+      const durationInput = item.querySelector('.step-duration-input');
+      const equipmentSelect = item.querySelector('.step-equipment-select');
+
+      if (!nameInput.value.trim()) {
+        nameInput.classList.add('input-error');
+        isValid = false;
+      } else {
+        nameInput.classList.remove('input-error');
+      }
+
+      if (!durationInput.value.trim() || parseFloat(durationInput.value) < 0) {
+        durationInput.classList.add('input-error');
+        isValid = false;
+      } else {
+        durationInput.classList.remove('input-error');
+      }
+
+      if (equipmentSelect.selectedOptions.length === 0) {
+        equipmentSelect.classList.add('input-error'); // Add error to select itself
+        isValid = false;
+      } else {
+        equipmentSelect.classList.remove('input-error');
+      }
     });
   }
 
-  const recipe={
-    product:prod,
-    stage,
-    code:document.getElementById('nr-code').value.trim()||'',
-    batchSize:size,
-    inputQty:parseFloat(document.getElementById('nr-input').value)||size,
-    outputQty:output,
-    cycleTime:time,
-    yield:yield_val,
-    steps,
-    createdAt:new Date().toISOString(),
-    updatedAt:new Date().toISOString()
+  return isValid;
+}
+
+function saveRecipe() {
+  if (!validateRecipeForm()) return;
+
+  const steps = [];
+  document.querySelectorAll('#nr-steps-list .step-builder-item').forEach(item => {
+    const nameInput = item.querySelector('.step-name-input');
+    const durationInput = item.querySelector('.step-duration-input');
+    const equipmentSelect = item.querySelector('.step-equipment-select');
+
+    steps.push({
+      name: nameInput.value.trim(),
+      duration: parseFloat(durationInput.value),
+      equipmentIds: Array.from(equipmentSelect.selectedOptions).map(option => option.value)
+    });
+  });
+
+  const newRecipe = {
+    product: document.getElementById('nr-prod').value.trim(),
+    stage: document.getElementById('nr-stage').value.trim(),
+    code: document.getElementById('nr-code').value.trim(),
+    batchSize: parseFloat(document.getElementById('nr-size').value),
+    inputQty: parseFloat(document.getElementById('nr-input').value) || parseFloat(document.getElementById('nr-size').value), // Default to batch size if empty
+    outputQty: parseFloat(document.getElementById('nr-output').value),
+    cycleTime: parseFloat(document.getElementById('nr-time').value),
+    yield: parseFloat(document.getElementById('nr-yield').value),
+    steps: steps,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
-  if(recipeEditIdx>=0){
-    recipeData[recipeEditIdx]=recipe;
-    recipeEditIdx=-1;
-  }else{
-    recipeData.push(recipe);
+  if (appState.editingRecipeIndex !== -1) {
+    // Editing existing recipe
+    appState.recipeData[appState.editingRecipeIndex] = newRecipe;
+  } else {
+    // Adding new recipe
+    appState.recipeData.push(newRecipe);
   }
 
   renderRecipes();
   closeModal('modal-add-recipe');
-  resetRecipeModal();
+  resetRecipeForm();
   saveData();
 }
 
-function editRecipe(idx){
-  const r=recipeData[idx];
-  recipeEditIdx=idx;
-  
-  document.getElementById('recipe-modal-title').textContent=`Edit Recipe: ${r.product}`;
-  document.getElementById('recipe-modal-save-btn').textContent='Update Recipe';
-  
-  document.getElementById('nr-prod').value=r.product;
-  document.getElementById('nr-stage').value=r.stage;
-  document.getElementById('nr-code').value=r.code||'';
-  document.getElementById('nr-size').value=r.batchSize;
-  document.getElementById('nr-input').value=r.inputQty;
-  document.getElementById('nr-output').value=r.outputQty;
-  document.getElementById('nr-time').value=r.cycleTime;
-  document.getElementById('nr-yield').value=r.yield;
-  
-  recipeStepTemp=JSON.parse(JSON.stringify(r.steps));
-  const list=document.getElementById('nr-steps-list');
-  list.innerHTML='';
-  
-  r.steps.forEach((s,sidx)=>{
-    const stepNum=sidx+1;
-    const stepId='step-'+stepNum;
-    const stepHtml=`
-      <div class="step-builder-item" id="${stepId}">
-        <input type="number" value="${stepNum}" readonly style="background:var(--bg4);cursor:not-allowed;"/>
-        <input type="text" value="${s.name}" id="sn-${stepNum}"/>
-        <select id="se-${stepNum}" multiple style="min-height:38px;">
-          ${equipmentData.map(e=>`<option value="${e.id}" ${s.equipIds.includes(e.id)?'selected':''}>${e.id} (${e.type})</option>`).join('')}
+function editRecipe(index) {
+  appState.editingRecipeIndex = index;
+  const recipe = appState.recipeData[index];
+
+  document.getElementById('recipe-modal-title').textContent = `Edit Recipe: ${recipe.product}`;
+  document.getElementById('recipe-modal-save-btn').textContent = 'Update Recipe';
+  document.getElementById('recipe-modal-save-btn').onclick = saveRecipe; // Ensure save handler is set
+
+  document.getElementById('nr-prod').value = recipe.product;
+  document.getElementById('nr-stage').value = recipe.stage;
+  document.getElementById('nr-code').value = recipe.code || '';
+  document.getElementById('nr-size').value = recipe.batchSize;
+  document.getElementById('nr-input').value = recipe.inputQty;
+  document.getElementById('nr-output').value = recipe.outputQty;
+  document.getElementById('nr-time').value = recipe.cycleTime;
+  document.getElementById('nr-yield').value = recipe.yield;
+
+  // Clear existing steps and populate from recipe
+  const listContainer = document.getElementById('nr-steps-list');
+  listContainer.innerHTML = '';
+  document.getElementById('nr-steps-empty').style.display = 'none'; // Hide empty state
+
+  recipe.steps.forEach((step, stepIdx) => {
+    const stepIndex = stepIdx; // Use actual index for consistency
+
+    const stepHtml = `
+      <div class="step-builder-item" data-step-index="${stepIndex}">
+        <input type="number" value="${stepIndex + 1}" readonly class="bg-gray-100 cursor-not-allowed"/>
+        <input type="text" placeholder="Operation Name" class="step-name-input" value="${step.name}" required/>
+        <select multiple class="step-equipment-select">
+          <!-- Options populated below -->
         </select>
-        <button class="btn danger step-remove-btn" onclick="removeRecipeStep('${stepId}',${stepNum})">Remove</button>
+        <input type="number" placeholder="Duration (hrs)" class="step-duration-input" value="${step.duration}" required min="0"/>
+        <button type="button" class="btn danger step-remove-btn">Remove</button>
       </div>
     `;
-    list.insertAdjacentHTML('beforeend',stepHtml);
+    listContainer.insertAdjacentHTML('beforeend', stepHtml);
+
+    // Populate the select with current equipment and set selected options
+    const currentSelect = listContainer.lastElementChild.querySelector('.step-equipment-select');
+    populateEquipmentOptions(currentSelect);
+    step.equipmentIds.forEach(eid => {
+      const option = currentSelect.querySelector(`option[value="${eid}"]`);
+      if (option) option.selected = true;
+    });
+
+    // Attach event listener for the remove button
+    listContainer.lastElementChild.querySelector('.step-remove-btn').addEventListener('click', function() {
+      removeRecipeStep(this.closest('.step-builder-item'));
+    });
   });
-  
-  document.getElementById('nr-steps-empty').style.display='none';
+
   openModal('modal-add-recipe');
 }
 
-function deleteRecipe(idx){
-  if(confirm(`શું ${recipeData[idx].product} recipe delete કરવું છે?`)){
-    recipeData.splice(idx,1);
+function deleteRecipe(index) {
+  if (confirm(`Are you sure you want to delete the recipe for "${appState.recipeData[index].product}"?`)) {
+    appState.recipeData.splice(index, 1);
     renderRecipes();
     saveData();
   }
 }
 
-// ══════════════════════════════════════
-// STARTUP
-// ══════════════════════════════════════
-loadData();
-renderEquipment();
-renderRecipes();
+// --- Initialization ---
+function initializeApp() {
+  loadData();
+  renderEquipment();
+  renderRecipes();
+  updateClock(); // Initial clock update
+  setInterval(updateClock, 1000); // Update clock every second
+
+  // Attach event listeners
+  document.getElementById('add-equipment-btn').addEventListener('click', () => {
+    resetEquipmentForm();
+    openModal('modal-add-equip');
+  });
+  document.getElementById('equip-modal-save-btn').addEventListener('click', addEquipment);
+
+  document.getElementById('add-recipe-btn').addEventListener('click', () => {
+    resetRecipeForm();
+    openModal('modal-add-recipe');
+  });
+  document.getElementById('recipe-modal-save-btn').addEventListener('click', saveRecipe);
+  document.getElementById('add-recipe-step-btn').addEventListener('click', addRecipeStep);
+
+  document.querySelectorAll('.bnav-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const tabId = this.getAttribute('data-tab');
+      switchTab(this, tabId);
+    });
+  });
+
+  // Handle recipe edit/delete button clicks dynamically (delegation)
+  document.getElementById('recipe-list-container').addEventListener('click', function(event) {
+    const target = event.target;
+    if (target.classList.contains('edit-recipe-btn')) {
+      const index = parseInt(target.getAttribute('data-index'), 10);
+      editRecipe(index);
+    } else if (target.classList.contains('delete-recipe-btn')) {
+      const index = parseInt(target.getAttribute('data-index'), 10);
+      deleteRecipe(index);
+    }
+  });
+
+  // Initial state for step builder empty message
+  if (document.getElementById('nr-steps-list').children.length === 0) {
+      document.getElementById('nr-steps-empty').style.display = 'block';
+  }
+}
+
+// Start the application
+initializeApp();
 </script>
 </body>
 </html>
